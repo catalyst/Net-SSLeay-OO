@@ -18,6 +18,6 @@ requires        ("perl" => 5.008005);
 requires        ("Moose" => 0.54);
 requires        ("Net::SSLeay" => 1.35);
 
-use t::CertTests;
+use t::TestCerts;
 
 &WriteAll;

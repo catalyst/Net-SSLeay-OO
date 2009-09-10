@@ -1,6 +1,16 @@
+
 package TestCerts;
-use FindBin qw($Bin);
 
-my $cert_dir = "$Bin/certs";
+my $cert_dir = "t/certs";
 
-system("$cert_dir/make-test-certs.sh 0</dev/null") == 0;
+print STDERR "*** making test certificates\n";
+my $output = `$cert_dir/make-test-certs.sh 0</dev/null 2>&1`;
+if ($? != 0) {
+	print STDERR "*** error making test certificates:\n";
+	print $output;
+}
+else {
+	print STDERR "*** done making test certificates\n";
+}
+
+1;

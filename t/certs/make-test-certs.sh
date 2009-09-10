@@ -3,6 +3,8 @@
 cd $(dirname $0)
 set -e
 
+touch index.txt
+
 # create a CA request
 if [ ! -s my-ca.req ]
 then
