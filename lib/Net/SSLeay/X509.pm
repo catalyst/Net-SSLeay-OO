@@ -9,10 +9,16 @@ has 'x509' =>
 	required => 1,
 	;
 
-#sub DESTROY {
-	#my $self = shift;
-	#$self->free;
-#}
+has 'no_rvinc' =>
+	isa => "Bool",
+	is => "ro",
+	;
+
+sub DESTROY {
+	my $self = shift;
+	$self->free
+		unless $self->no_rvinc;
+}
 
 # free()
 # get_ext()

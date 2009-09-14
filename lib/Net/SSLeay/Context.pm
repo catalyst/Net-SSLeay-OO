@@ -15,17 +15,18 @@ Net::SSLeay::Context - OO interface to Net::SSLeay CTX_ methods
  use Net::SSLeay::Constants qw(OP_ALL FILETYPE_PEM OP_NO_SSLv2);
  use Net::SSLeay::Context;
 
+ # create an SSL object, disable SSLv2
  my $ctx = Net::SSLeay::Context->new;
  $ctx->set_options(OP_ALL & OP_NO_SSLv2);
 
- # specify path to your certificates
+ # specify path to your CA certificates for verifying peer
  $ctx->load_verify_locations($ca_filename, $db_dir);
 
- # load our certificate/key
+ # optional for clients - load our own certificate/key
  $ctx->use_certificate_chain_file($cert_filename);
  $ctx->use_PrivateKey_file($key_filename, FILETYPE_PEM);
 
- # let's be very strict!
+ # optional for servers - require peer certificates
  $ctx->set_verify(VERIFY_PEER & VERIFY_FAIL_IF_NO_PEER_CERT);
 
  # now make SSL objects with these options!
@@ -36,11 +37,11 @@ Net::SSLeay::Context - OO interface to Net::SSLeay CTX_ methods
 
 Every SSL connection has a context, which specifies various options.
 You can also specify these options on Net::SSLeay::SSL objects, but
-you would normally want
+you would normally want to set up as much as possible early on, then
+re-use the context to create new SSL handles.
 
-This module adds some OO niceties to using the Net::SSLeay / OpenSSL
-context objects.  For a start, you get a blessed object rather than an
-integer to work with, so you know what you are dealing with.
+The OpenSSL library initialization functions are called the first time
+that a Net::SSLeay::Context object is instantiated.
 
 =cut
 
@@ -134,14 +135,19 @@ be made by L<c_rehash>.  See L<SSL_CTX_load_verify_locations(3ssl)>.
 =head2 set_verify($mode, [$verify_callback])
 
 Mode should be either VERIFY_NONE, or a combination of VERIFY_PEER,
-VERIFY_CLIENT_ONCE and/or VERIFY_FAIL_IF_NO_PEER_CERT.  The callback
-is
+VERIFY_CLIENT_ONCE and/or VERIFY_FAIL_IF_NO_PEER_CERT.  If you don't
+set this as a server, you cannot later call
+C<-E<gt>get_peer_certificate> to find out if the client configured a
+certificate.
 
 =cut
 
 use Net::SSLeay::Constants qw(VERIFY_NONE);
 
-sub _set_verify {
+has 'verify_cb',
+	is => "ro";
+
+sub set_verify {
 	my $self = shift;
 	my $mode = shift;
 	my $callback = shift;
@@ -157,9 +163,16 @@ sub _set_verify {
 			$callback->($preverify_ok, $x509_ctx);
 		}
 	};
+	$self->_set_verify($mode, $real_cb);
+}
+
+sub _set_verify {
+	my $self = shift;
+	my $mode = shift;
+	my $real_cb = shift;
 	my $ctx = $self->ctx;
-	print STDERR "Net::SSLeay::set_verify($ctx, $mode, $real_cb);\n";
-	Net::SSLeay::set_verify($ctx, $mode, $real_cb);
+	$self->{verify_cb} = $real_cb;
+	Net::SSLeay::CTX_set_verify($ctx, $mode, $real_cb);
 }
 
 =head2 use_certificate_file($filename, $type)

@@ -13,14 +13,23 @@ Net::SSLeay::SSL - OO interface to Net::SSLeay methods
  use Net::SSLeay::Constants qw(OP_ALL);
  use Net::SSLeay::SSL;
 
+ # basic (insecure!) use - see below
  my $ssl = Net::SSLeay::SSL->new;
  $ssl->set_fd(fileno($socket));
+ $ssl->connect;
 
 =head1 DESCRIPTION
 
 This module adds some OO niceties to using the Net::SSLeay / OpenSSL
-SSL objects.  For a start, you get a blessed object rather than an
-integer to work with, so you know what you are dealing with.
+SSL objects.
+
+This SSL object is a per-connection entity.  In general you will
+create one of these from a L<Net::SSLeay::Context> object which you
+set up for your process and perhaps configured more fully.
+
+If you do not do that, then you are not certifying the authenticity of
+the peer.  This means that your program will be vulnerable to MITM
+(man in the middle) attacks.
 
 =cut
 
@@ -61,6 +70,11 @@ has 'ctx' =>
 	},
 	;
 
+sub BUILD {
+	my $self = shift;
+	$self->ssl;
+}
+
 =back
 
 =cut
@@ -85,87 +99,341 @@ from the OpenSSL library are actually imported.
 
 =cut
 
-=head2 set_options(OP_XXX & OP_XXX ...)
+=head2 Handshake configuration methods
 
-Set options that apply to this Context.  The valid values and
-descriptions can be found on L<SSL_CTX_set_options(3ssl)>; for this
-module they must be imported from L<Net::SSLeay::Constants>.
+These options are all intended to control the handshake phase of SSL
+negotiations.
 
-Returns the active bitmask.
+=over
 
-=head2 get_options()
+=item B<set_options(OP_XXX & OP_XXX ...)>
 
-Returns the current options bitmask; mask with the option you're
-interested in to see if it is set:
+=item B<get_options()>
 
-  unless ($ctx->get_options & OP_NO_SSLv2) {
-      die "SSL v2 was not disabled!";
-  }
+=item B<set_verify($mode, [$verify_callback])>
 
-=head2 load_verify_locations($filename, $path)
+=item B<use_certificate(Net::SSLeay::X509 $cert)>
 
-Specify where CA certificates in PEM format are to be found.
-C<$filename> is a single file containing one or more certificates.
-C<$path> refers to a directory with C<9d66eef0.1> etc files as would
-be made by L<c_rehash>.  See L<SSL_CTX_load_verify_locations(3ssl)>.
+=item B<use_certificate_file($filename, $type)>
 
-=head2 set_verify($mode, [$verify_callback])
+=item B<use_PrivateKey_file($filename, $type)>
 
-Mode should be either VERIFY_NONE, or a combination of VERIFY_PEER,
-VERIFY_CLIENT_ONCE and/or VERIFY_FAIL_IF_NO_PEER_CERT.  The callback
-is
+=item B<set_cipher_list($list)>
+
+These functions are all very much the same as in
+C<Net::SSLeay::Context> but apply only to this SSL object.  Note that
+some functions are not available, such as
+C<use_certificate_chain_file()> and C<set_default_cb_passwd()>
+
+=back
 
 =cut
 
-sub BUILD {
-	my $self = shift;
-	$self->ssl;
+has 'verify_cb',
+	is => "ro";
+BEGIN{
+	no strict 'refs';
+	*$_ = \&{"Net::SSLeay::Context::$_"}
+		for qw(set_verify use_certificate);
 }
 
-use Net::SSLeay::Constants qw(VERIFY_NONE);
-
-sub set_verify {
+sub _set_verify {
 	my $self = shift;
 	my $mode = shift;
-	my $callback = shift;
-	# always set a callback, unless VERIFY_NONE "is set"
-	my $real_cb = $mode == VERIFY_NONE ? 0 : sub {
-		my ($preverify_ok, $x509_ctx) = @_;
-		if ( $callback ) {
-			my $x509_ctx = Net::SSLeay::X509::Context->new(
-				ctx => $x509_ctx,
-				);
-			$callback->($preverify_ok, $x509_ctx);
-		}
-	};
-	Net::SSLeay::set_verify($self->ctx, $mode, $real_cb);
+	my $real_cb = shift;
+	my $ssl = $self->ssl;
+	$self->{verify_cb} = $real_cb;
+	Net::SSLeay::set_verify($ssl, $mode, $real_cb);
 }
 
-=head2 use_certificate_file($filename, $type)
+=head2 Setup methods
 
-C<$filename> is the name of a local file.  This becomes your local
-cert - client or server.
+These methods set up the SSL object within your process - connecting
+it to filehandles and so on.
 
-C<$type> may be SSL_FILETYPE_PEM or SSL_FILETYPE_ASN1.
+=over
 
-=head2 use_certificate_chain_file($filename)
+=item B<set_fd(fileno($fh))>
 
-C<$filename> is the name of a local PEM file, containing a chain of
-certificates which lead back to a valid root certificate.  This is
-probably the option you really should use for flexible (albeit PEM
-only) use.
+=item B<get_fd(fileno($fh))>
 
-=head2 use_PrivateKey_file($filename, $type);
+Sets/Gets the file descriptor number for send and receive.
 
-If using a certificate, you need to specify the private key of the end
-of the chain.  Specify it here; set C<$type> as with
-C<use_certificate_file>
+=item B<set_rfd(fileno($fh))>
+
+=item set_wfd(fileno($fh))>
+
+Specify the file descriptors for send and receive independently.
+Useful when dealing with non-socket entities such as pipes.
+
+=item B<set_read_ahead($boolean)>
+
+=item B<get_read_ahead()>
+
+See L<SSL_set_read_ahead(3ssl)>
+
+=back
+
+=head2 Handshake/SSL session methods
+
+=over
+
+=item B<accept()>
+
+=item B<connect()>
+
+Initiate the SSL session, from the perspective of a server or a
+client, respectively.
+
+=item B<clear()>
+
+Forget the current SSL session.  You probably don't want to use this.
+
+=item B<shutdown()>
+
+Sends a "close notify" shutdown alert to the peer.  You should do this
+before you shut down the underlying socket.
+
+=back
+
+=head2 IO functions
+
+=over
+
+=item B<ssl_read_all>
+
+=item B<ssl_read_CRLF( $max_length? )>
+
+=item B<ssl_read_until( $delimit?, $max_length? )>
+
+These are L<Net::SSLeay> wrappers to the OpenSSL read methods; use
+these if you are not sure how to use the other ones.  These are
+blocking calls.  Note that C<ssl_read_all> will read from the socket
+until the remote end shuts down.  C<ssl_read_CRLF> and
+C<ssl_read_until> use the undocumented OpenSSL function C<SSL_peek> to
+read the entire pending buffer, figure out at what point the delimiter
+appears and then C<SSL_read> just enough to clear that.
+
+=item B<read($max?)>
+
+Perform and return read of the rest of the next SSL record, or C<$max>
+bytes, whichever is smaller.  How large that record is depends on the
+sender, but you need to receive an entire record before you can
+extract any data from it anyway.
+
+=item B<peek($max?)>
+
+Like C<read()>, but doesn't clear the data from the session buffer.
+
+=item B<ssl_write_all($message)>
+
+=item B<ssl_write_CRLF($line)>
+
+Convenience wrappers for writing a message or a single line to the
+socket via SSL.  Note that C<ssl_write_CRLF> sends the CRLF two-byte
+sequence to OpenSSL in its own C<SSL_write> function call, with a
+comment warning that this "uses less memory but might use more network
+packets".
+
+=item B<write($message)>
+
+Pretty much a direct method for C<SSL_write>; writes the message and
+returns the number of bytes written.
+
+=item B<write_partial($from, $count, $message)>
+
+Writes a substring of the message and returns the number of bytes
+written.
+
+This interface is probably unnecessary since about Perl 5.8.1, as on
+those perls C<substr()> can refer to substrings of other strings.
+
+=back
+
+=head2 Informative methods
+
+These methods return information about the current SSL object
+
+=over
+
+=item B<get_error>
+
+Returns the error from the last IO operation, you can match this
+against various constants as described on L<SSL_get_error(3ssl)>.
+
+=item B<want>
+
+A simpler version of C<get_error>, see C<SSL_want(3ssl)>.
+
+=item B<get_cipher>
+
+The cipher of the current session
+
+=item B<get_peer_certificate>
+
+Returns a L<Net::SSLeay::X509> object corresponding to the peer
+certificate; if you're a client, it's the server certificate.  If
+you're a server, it's the client certificate, if you requested it
+during handshake with C<set_verify>.
 
 =cut
 
-use Net::SSLeay::Functions 'ssl';
+sub get_peer_certificate {
+	my $self = shift;
+	my $x509 = Net::SSLeay::get_peer_certificate($self->ssl);
+	if ( $x509 ) {
+		Net::SSLeay::X509->new(x509 => $x509);
+	}
+}
+
+=item B<get_session>
+
+Returns a Net::SSLeay::Session object corresponding to the SSL
+session.  This actually calls C<SSL_get1_session> to try to help save
+you from segfaults.
+
+=item B<set_session($session)>
+
+If for some reason you want to set the session, call this method,
+passing a Net::SSLeay::Session object.
+
+=cut
+
+sub get_session {
+	my $self = shift;
+	my $sessid = Net::SSLeay::get1_session($self->ssl);
+	if ( $sessid ) {
+		Net::SSLeay::Session->new(session => $sessid);
+	}
+}
+
+sub set_session {
+	my $self = shift;
+	my $session = shift;
+	Net::SSLeay::set_session($self->ssl, $session->session);
+}
+
+=item B<state_string>
+
+=item B<state_string_long>
+
+Return a codified or human-readable string 'indicating the current
+state of the SSL object'.
+
+L<SSL_state_string(3ssl)> sez ''Detailed description of possible
+states to be included later''
+
+=item B<rstate_string>
+
+=item B<rstate_string_long>
+
+Return information about the read state.  In a blocking environment,
+this should always return "RD" or "read done".  Otherwise, you'll get
+something else possibly informative.
+
+=back
+
+=head2 Un-triaged
+
+The following methods I haven't looked at at all; if you use them in a
+program, please submit a patch which moves them into one of the above
+categories.  The best information about them will be found on the
+relevant SSL man page - use C<man -k> or C<apropros> to find a useful
+man page.
+
+My policy on these is that no function should take an unwrapped
+pointer argument or return an unwrapped pointer.  So long as the
+function you use doesn't do that, you can reasonably expect its call
+interface not to change; but of course I place no guarantees should
+OpenSSL or Net::SSLeay ruin your day.
+
+ add_client_CA(ssl,x)
+ alert_desc_string(value)
+ alert_desc_string_long(value)
+ alert_type_string(value)
+ alert_type_string_long(value)
+ callback_ctrl(ssl,i,fp)
+ check_private_key(ctx)
+ do_handshake(s)
+ dup(ssl)
+ get_current_cipher(s)
+ get_default_timeout(s)
+ get_ex_data(ssl,idx)
+ get_finished(s,buf,count)
+ get_peer_finished(s,buf,count)
+ get_quiet_shutdown(ssl)
+ get_shutdown(ssl)
+ get_verify_depth(s)
+ get_verify_mode(s)
+ get_verify_result(ssl)
+ renegotiate(s)
+ set_accept_state(s)
+ set_client_CA_list(s,list)
+ set_connect_state(s)
+ set_ex_data(ssl,idx,data)
+ set_info_callback(ssl,cb)
+ set_purpose(s,purpose)
+ set_quiet_shutdown(ssl,mode)
+ set_shutdown(ssl,mode)
+ set_trust(s,trust)
+ set_verify_depth(s,depth)
+ set_verify_result(ssl,v)
+ version(ssl)
+ load_client_CA_file(file)
+ add_file_cert_subjects_to_stack(stackCAs,file)
+ add_dir_cert_subjects_to_stack(stackCAs,dir)
+ set_session_id_context(ssl,sid_ctx,sid_ctx_len)
+ set_tmp_rsa_callback(ssl, cb)
+ set_tmp_dh_callback(ssl,dh)
+ get_ex_new_index(argl, argp, new_func, dup_func, free_func)
+ clear_num_renegotiations(ssl)
+ get_app_data(s)
+ get_cipher_bits(s,np)
+ get_mode(ssl)
+ get_state(ssl)
+ need_tmp_RSA(ssl)
+ num_renegotiations(ssl)
+ session_reused(ssl)
+ set_app_data(s,arg)
+ set_mode(ssl,op)
+ set_pref_cipher(s,n)
+ set_tmp_dh(ssl,dh)
+ set_tmp_rsa(ssl,rsa)
+ total_renegotiations(ssl)
+ get_client_random(s)
+ get_server_random(s)
+ get_keyblock_size(s)
+ set_hello_extension(s, type, data)
+ set_session_secret_cb(s,func,data=NULL)
+
+=cut
+
+# excluded because they were either named badly for their argument
+# types, because I didn't want to implement versions which would have
+# to take pointers directly as integers, because there was no OpenSSL
+# man page for them, or because they were marked as not for general
+# consumption.
+
+use Net::SSLeay::Functions 'ssl',
+	-exclude => [qw( get_time set_time get_timeout set_timeout
+			 set_bio get_rbio get_wbio get0_session
+			 get1_session ctrl callback_ctrl state
+			 set_ssl_method get_ssl_method
+		       )];
 
 1;
+
+__END__
+
+=head1 AUTHOR AND LICENSE
+
+This module was written by Sam Vilain, L<samv@cpan.org>
+
+Copyright 2009, NZ Registry Services.  This program is Free Software;
+you may use it under the terms of the Artistic License 2.0.  See
+L<Net::SSLeay::OO> for more information.
+
+=cut
 
 # Local Variables:
 # mode:cperl
