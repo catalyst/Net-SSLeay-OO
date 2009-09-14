@@ -281,6 +281,7 @@ during handshake with C<set_verify>.
 sub get_peer_certificate {
 	my $self = shift;
 	my $x509 = Net::SSLeay::get_peer_certificate($self->ssl);
+	&Net::SSLeay::Error::die_if_ssl_error("get_peer_certificate");
 	if ( $x509 ) {
 		Net::SSLeay::X509->new(x509 => $x509);
 	}
@@ -303,6 +304,7 @@ sub get_session {
 	my $self = shift;
 	require Net::SSLeay::Session;
 	my $sessid = Net::SSLeay::get1_session($self->ssl);
+	&Net::SSLeay::Error::die_if_ssl_error("get_session");
 	if ( $sessid ) {
 		Net::SSLeay::Session->new(session => $sessid);
 	}
@@ -312,6 +314,7 @@ sub set_session {
 	my $self = shift;
 	my $session = shift;
 	Net::SSLeay::set_session($self->ssl, $session->session);
+	&Net::SSLeay::Error::die_if_ssl_error("set_session");
 }
 
 =item B<state_string>

@@ -166,6 +166,7 @@ sub set_verify {
 		}
 	};
 	$self->_set_verify($mode, $real_cb);
+	&Net::SSLeay::Error::die_if_ssl_error("set_verify");
 }
 
 sub _set_verify {
@@ -202,13 +203,12 @@ C<use_certificate_file>
 sub get_cert_store {
 	my $self = shift;
 	require Net::SSLeay::X509::Store;
-	Net::SSLeay::X509::Store->new(
-		x509_store => Net::SSLeay::CTX_get_cert_store($self->ctx),
-		);
+	my $store = Net::SSLeay::CTX_get_cert_store($self->ctx),
+	&Net::SSLeay::Error::die_if_ssl_error("get_cert_store");
+	Net::SSLeay::X509::Store->new( x509_store => $store );
 }
 
 use Net::SSLeay::Functions "ctx";
-
 
 1;
 
