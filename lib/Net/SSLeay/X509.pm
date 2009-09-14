@@ -28,7 +28,7 @@ sub DESTROY {
 
 BEGIN {
 	no strict 'refs';
-	for my $nameFunc ( qw(subject_name issuer_name subjectAltNames) ) {
+	for my $nameFunc ( qw(subject_name issuer_name) ) {
 		my $get = "get_$nameFunc";
 		my $sslfunc = "Net::SSLeay::X509_$get";
 		*$get = sub {
@@ -40,13 +40,7 @@ BEGIN {
 	}
 }
 
-use Net::SSLeay::Functions sub {
-	my $code = shift;
-	sub {
-		my $self = shift;
-		$code->($self->x509, @_);
-	};
-};
+use Net::SSLeay::Functions 'x509';
 
 # load_cert_crl_file()
 # load_cert_file()

@@ -27,7 +27,6 @@ challengePassword              = A challenge password
 default_ca	= test_ca
 
 [ test_ca ]
-
 dir		= .
 certs		= $dir/.
 crl_dir		= $dir/.
@@ -44,6 +43,8 @@ RANDFILE	= $dir/.rand
 email_in_dn = no
 
 x509_extensions	= usr_cert
+# thank-you, http://www.phildev.net/ssl/opensslconf.xhtml
+copy_extensions = copy
 
 # Comment out the following two lines for the "traditional"
 # (and highly broken) format.
@@ -64,11 +65,13 @@ organizationName	= match
 organizationalUnitName	= optional
 commonName		= supplied
 emailAddress		= optional
+#subjectAltName		= optional
 
 [ v3_ca ]
 subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid:always,issuer:always
 basicConstraints = critical,CA:true
+#subjectAltName=email:move
 
 [ usr_cert ]
 basicConstraints=CA:FALSE

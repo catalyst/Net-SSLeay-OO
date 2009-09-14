@@ -17,7 +17,20 @@ use Net::SSLeay::Functions sub {
 	};
 };
 
-# get_current_cert()
+sub get_current_cert {
+	my $self = shift;
+	my $x509 = Net::SSLeay::X509_STORE_CTX_get_current_cert(
+		$self->x509_store_ctx,
+		);
+	if ( $x509 ) {
+		require Net::SSLeay::X509;
+		Net::SSLeay::X509->new(x509 => $x509, no_rvinc => 1);
+	}
+}
+
+# getting all these right is made harder by the lack of OpenSSL docs
+# for these methods...
+
 # get_error()
 # get_error_depth()
 # get_ex_data()

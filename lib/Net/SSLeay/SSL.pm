@@ -301,6 +301,7 @@ passing a Net::SSLeay::Session object.
 
 sub get_session {
 	my $self = shift;
+	require Net::SSLeay::Session;
 	my $sessid = Net::SSLeay::get1_session($self->ssl);
 	if ( $sessid ) {
 		Net::SSLeay::Session->new(session => $sessid);

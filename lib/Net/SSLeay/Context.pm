@@ -153,14 +153,16 @@ sub set_verify {
 	my $callback = shift;
 	# always set a callback, unless VERIFY_NONE "is set"
 	my $real_cb = $mode == VERIFY_NONE ? undef : sub {
-		print STDERR "got here!\n";
 		my ($preverify_ok, $x509_store_ctx) = @_;
 		if ( $callback ) {
-			print STDERR "callback!\n";
 			my $x509_ctx = Net::SSLeay::X509::Context->new(
 				x509_store_ctx => $x509_store_ctx,
 				);
-			$callback->($preverify_ok, $x509_ctx);
+			my $cert = $x509_ctx->get_current_cert;
+			$callback->($preverify_ok, $cert);
+		}
+		else {
+			$preverify_ok;
 		}
 	};
 	$self->_set_verify($mode, $real_cb);

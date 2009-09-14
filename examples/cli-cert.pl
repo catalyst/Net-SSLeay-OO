@@ -104,12 +104,9 @@ use Net::SSLeay::X509;
 
 our $PRINTED;
 sub verify {
-    my ($ok, $x509_store_ctx) = @_;
+    my ($ok, $x509_cert) = @_;
     print "$$: **** Verify 2 called ($ok)\n";
-    my $x509_store_ctx = Net::SSLeay::X509::Context->new(x509_store_ctx => $x509_store_ctx);
-    my $x = $x509_store_ctx->get_current_cert;
-    my $x509_cert = Net::SSLeay::X509->new(x509 => $x);
-    if ($x) {
+    if ($x509_cert) {
 	print "$$: Certificate:\n";
 	    print "  Subject Name: "
 		. $x509_cert->get_subject_name->oneline

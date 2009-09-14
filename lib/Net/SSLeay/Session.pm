@@ -1,5 +1,5 @@
 
-package Net::SSLeay::X509::Session;
+package Net::SSLeay::Session;
 
 use Moose;
 
