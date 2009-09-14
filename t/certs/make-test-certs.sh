@@ -46,7 +46,15 @@ do
   fi
 done
 
-c_rehash .
+# this is like c_rehash, but we only want to mark the CA cert as
+# trusted
+fs=[0-9a-f]
+for x in 1 2 3; do fs="$fs$fs"; done
+rm $fs.[0-9] 2>/dev/null || true
+ln -s my-ca.pem $(openssl x509 -hash -noout -in my-ca.pem).0
+
+# should say "OK" for all certificates
+openssl verify -CApath . my-ca.pem server-cert.pem client-cert.pem
 
 echo "All certificates made."
 

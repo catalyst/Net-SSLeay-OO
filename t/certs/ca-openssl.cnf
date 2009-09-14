@@ -17,7 +17,8 @@ L                      = Test Locality
 O                      = Organization Name
 OU                     = Organizational Unit Name
 CN                     = Test CA
-emailAddress           = ca@example.com
+# if you set this, then the certificate doesn't self-verify..
+#emailAddress           = ca@example.com
 
 [ req_attributes ]
 challengePassword              = A challenge password
