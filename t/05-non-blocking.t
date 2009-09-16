@@ -16,7 +16,8 @@ our $DEBUG = $ENV{DEBUG_SSL};
 use Net::SSLeay::Constants qw(ERROR_WANT_READ ERROR_WANT_WRITE
 			      ERROR_NONE ERROR_WANT_CONNECT
 			      FILETYPE_PEM
-			      );
+			      MODE_ENABLE_PARTIAL_WRITE
+			      MODE_ACCEPT_MOVING_WRITE_BUFFER );
 
 $ctx->set_default_passwd_cb(sub { "secr1t" });
 
@@ -33,12 +34,14 @@ $server->set_rfd(fileno(RS)); $server->set_wfd(fileno(WS));
 
 $_->blocking(0) for (\*RS, \*WS, \*RC, \*WC);
 # SSL_MODE_* not imported by Net::SSLeay
-#  1 = SSL_MODE_ENABLE_PARTIAL_WRITE - write SSL records at a time.
-#  2 = SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER - ``This is not the default
-#          to avoid the misconception that non-blocking SSL_write() behaves
-#          like non-blocking write().'' - with it, it seems to... odd.
-$server->set_mode(3);
-$client->set_mode(3);
+#  SSL_MODE_ENABLE_PARTIAL_WRITE - write single SSL records at a time.
+#  SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER - ``This is not the default to
+#          avoid the misconception that non-blocking SSL_write()
+#          behaves like non-blocking write().'' - with it, it seems
+#          to... odd.
+my $mode = ( MODE_ENABLE_PARTIAL_WRITE | MODE_ACCEPT_MOVING_WRITE_BUFFER );
+$server->set_mode($mode);
+$client->set_mode($mode);
 
 $client->set_connect_state;
 $server->set_accept_state;
