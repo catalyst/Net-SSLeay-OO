@@ -16,8 +16,15 @@ has 'no_rvinc' =>
 
 sub DESTROY {
 	my $self = shift;
-	$self->free
-		unless $self->no_rvinc;
+	$self->free;
+}
+
+sub free {
+	my $self = shift;
+	my $pointer = delete $self->{x509};
+	unless ( !$pointer or $self->no_rvinc ) {
+		Net::SSLeay::free($pointer);
+	}
 }
 
 # free()
