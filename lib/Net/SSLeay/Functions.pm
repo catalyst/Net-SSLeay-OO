@@ -112,6 +112,9 @@ Net::SSLeay::Functions - convert Net::SSLeay functions to methods
 
 =head1 SYNOPSIS
 
+ use Net::SSLeay::Functions 'foo';
+
+ # means, roughly:
  use Net::SSLeay::Functions sub {
          my $code = shift;
          sub {
@@ -131,6 +134,10 @@ the symbol table of the calling namespace.
 If a function is passed instead of a closure, it is taken to be the
 name of an attribute which refers to where the Net::SSLeay magic
 pointer is kept.
+
+The difference between the version of the installed handler function
+and the actual installed function is that the real one checks for
+OpenSSL errors which were raised while the function was called.
 
 =cut
 
