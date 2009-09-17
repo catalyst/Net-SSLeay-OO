@@ -31,7 +31,8 @@ my $ssl_id;
 			);
 	};
 	isa_ok($@, "Net::SSLeay::Error", "exception");
-		#&& diag $@;
+	isa_ok($@->next, "Net::SSLeay::Error", "exception trace");
+	#diag $@;
 
 	my $old_sub = \&Net::SSLeay::SSL::free;
 	no warnings 'redefine';
