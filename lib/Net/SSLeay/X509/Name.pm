@@ -124,6 +124,4 @@ fields:
 	key_usage    NID_key_usage
 	serial       NID_serialNumber
 
-=back
-
 =cut
