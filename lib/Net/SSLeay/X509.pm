@@ -56,6 +56,121 @@ use Net::SSLeay::Functions 'x509';
 
 1;
 
+__END__
+
+=head1 NAME
+
+Net::SSLeay::X509 - OpenSSL SSL certificate
+
+=head1 SYNOPSIS
+
+ # currently no way to create them with this module
+ my $cert = $ssl->get_peer_certificate;
+
+ # important stuff
+ my $subject = $cert->get_subject_name;
+ my $issuer  = $cert->get_issuer_name;
+
+ say "This cert is for ".$subject->cn.
+    ", and was issued by ".$issuer->cn;
+
+ # see full description for a less cryptic example :)
+ my $i = 0;
+ my @names = grep { $i ^= 1 } $cert->get_subjectAltNames;
+ say "This cert also covers @names";
+
+=head1 DESCRIPTION
+
+This module encapsulates X509 certificates, the C<X509*> type in
+OpenSSL's C library.
+
+The functions available to this library are focused on pulling useful
+information out of the SSL certificates that were exchanged.
+
+As a result, there are no methods for creating the certificates - and
+there is seldom need to do such things outside of the typical OpenSSL
+command-line set and existing programs to do that.  See
+F<t/certs/make-test-certs.sh> in the distribution for a shell script
+which uses the C<openssl req> and C<openssl ca> commands to create
+certificates which are used for the test suite.
+
+=head1 METHODS
+
+=head2 Certificate Information Methods
+
+=over
+
+=item B<get_subject_name>
+
+=item B<get_issuer_name>
+
+The Subject Name is the X.509 Name which represents the identity of
+this certificate.  Using a PGP analogy, it's like the KeyID.  It has
+fields like country, cn / commonName (normally a domain name),
+locality and what your favourite chicken species for sacrificial use
+are.
+
+The Issuer Name is another X.509 Name which represents the identity
+which signs this certificate.  Unlike PGP, individual SSL certificates
+can only have one signature attached, which needs to lead back to some
+trusted root certificate.
+
+These entities are not strings; they are L<Net::SSLeay::X509::Name>
+objects.
+
+=item B<get_subjectAltNames>
+
+This is a method in L<Net::SSLeay> which wraps up the new vhosting SSL
+certificate support, so that you can see the alternate names on that
+SSL certificate.
+
+Unlike the C<get_*_name> methods, this method returns a list of pairs;
+the first item in the pair being the type of name, and the second one
+being a string representation of that name.
+
+=item B<get_notBefore(cert)>
+
+=item B<get_notAfter(cert)>
+
+These methods probably return validity period times for the
+certificate.  To be confirmed.
+
+=back
+
+=head2 Arcane Internal Methods
+
+The notes on L<Net::SSLeay::Context> about the un-triaged methods all
+apply to these methods.
+
+=over
+
+=item B<get_ext_by_NID(x,nid,loc)>
+
+=item B<get_ext(x,loc)>
+
+These probably have something to do with extensible additions to SSL
+certificates; the subjectAltNames implementation calls these methods.
+
+=item B<load_cert_file(ctx, file, type)>
+
+=item B<load_crl_file(ctx, file, type)>
+
+=item B<load_cert_crl_file(ctx, file, type)>
+
+These methods take a C<X509_LOOKUP*> as their first argument.  I
+really wouldn't recommend them.
+
+=item B<verify_cert_error_string(n)>
+
+Don't call this as a method.  It seems to be a function that takes an
+error code from some other function and returns the string
+corresponding to that error.
+
+=back
+
+=cut
+
+
 # Local Variables:
 # mode:cperl
 # indent-tabs-mode: t
