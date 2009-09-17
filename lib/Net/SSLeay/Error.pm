@@ -46,7 +46,6 @@ has 'next' =>
 sub BUILD {
 	my $self = shift;
 	my $ssl_error = $self->error_string;
-	print STDERR "Human readable? $ssl_error\n";
 	(undef, my @fields) = split ":", $ssl_error, 5;
 	$self->{error_code} ||= hex(shift @fields);
 	$self->{library_name} ||= shift @fields;
