@@ -18,7 +18,7 @@ sub DESTROY {
 
 1;
 
-__CUT__
+__END__
 
 =head1 NAME
 
