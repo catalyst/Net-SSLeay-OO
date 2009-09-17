@@ -22,7 +22,7 @@ USE
 	plan skip_all => 'Test::Pod::Coverage 1.04 required' if $@;
 }
 plan skip_all => 'set TEST_POD or TEST_ALL to enable this test'
-	unless $ENV{TEST_POD} or $ENV{TEST_ALL}
+	unless $ENV{TEST_POD} or $ENV{TEST_ALL};
 
 my @modules = all_modules;
 
