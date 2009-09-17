@@ -118,8 +118,6 @@ negotiations.
 
 =item B<use_PrivateKey_file($filename, $type)>
 
-=item B<set_cipher_list($list)>
-
 These functions are all very much the same as in
 C<Net::SSLeay::Context> but apply only to this SSL object.  Note that
 some functions are not available, such as
@@ -171,6 +169,20 @@ Useful when dealing with non-socket entities such as pipes.
 =item B<get_read_ahead()>
 
 See L<SSL_set_read_ahead(3ssl)>
+
+=item B<set_mode($mode)>
+
+=item B<get_mode()>
+
+Sets/gets the mode of the SSL object.  See L<SSL_set_mode(3ssl)>.  If
+you want non-blocking use, set:
+
+   $ssl->set_mode( MODE_ENABLE_PARTIAL_WRITE |
+                   MODE_ACCEPT_MOVING_WRITE_BUFFER );
+
+See F<t/05-non-blocking.t> for a more complete example of using this
+library in non-blocking mode.  Note you still need to mark the
+underlying filehandle as non-blocking.
 
 =back
 
@@ -351,6 +363,7 @@ function you use doesn't do that, you can reasonably expect its call
 interface not to change; but of course I place no guarantees should
 OpenSSL or Net::SSLeay ruin your day.
 
+ set_cipher_list($list)
  add_client_CA(ssl,x)
  alert_desc_string(value)
  alert_desc_string_long(value)
