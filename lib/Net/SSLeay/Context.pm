@@ -91,6 +91,7 @@ sub BUILD {
 	if ( ! $self->ctx ) {
 		my $ctx = Net::SSLeay::new_x_ctx($self->ssl_version);
 		$self->{ctx} = $ctx;
+		$self->set_default_verify_paths;
 	}
 }
 
