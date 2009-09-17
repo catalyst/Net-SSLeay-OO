@@ -17,8 +17,6 @@ our %field_to_NID = qw(
 	state NID_stateOrProvinceName
 	org NID_organizationName
 	org_unit NID_organizationalUnitName
-	subject_alt NID_subject_alt_name
-	issuer_alt NID_issuer_alt_name
 	subject_key NID_subject_key_identifier
 	key_usage NID_key_usage
 	serial NID_serialNumber
@@ -122,8 +120,6 @@ fields:
 	state        NID_stateOrProvinceName
 	org          NID_organizationName
 	org_unit     NID_organizationalUnitName
-	subject_alt  NID_subject_alt_name
-	issuer_alt   NID_issuer_alt_name
 	subject_key  NID_subject_key_identifier
 	key_usage    NID_key_usage
 	serial       NID_serialNumber
