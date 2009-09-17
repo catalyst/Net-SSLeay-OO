@@ -33,6 +33,9 @@ Net::SSLeay::Context - OO interface to Net::SSLeay CTX_ methods
  use Net::SSLeay::SSL;
  my $ssl = Net::SSLeay::SSL->new( ctx => $ctx );
 
+ # convenience method for the above, plus attach to a socket
+ my $ssl = $ctx->new_ssl($socket);
+
 =head1 DESCRIPTION
 
 Every SSL connection has a context, which specifies various options.
@@ -109,15 +112,20 @@ All of the CTX_ methods in Net::SSLeay are converted to methods of
 the Net::SSLeay::Context class.
 
 The documentation that follows is a core set, sufficient for running
-up a server and verifying client certificates.
+up a server and verifying client certificates.  However most functions
+from the OpenSSL library are actually imported.
 
-=head2 set_options(OP_XXX & OP_XXX ...)
+=head2 Handshake configuration methods
+
+=over
+
+=item B<set_options(OP_XXX | OP_XXX ...)>
 
 Set options that apply to this Context.  The valid values and
 descriptions can be found on L<SSL_CTX_set_options(3ssl)>; for this
 module they must be imported from L<Net::SSLeay::Constants>.
 
-=head2 get_options()
+=item B<get_options()>
 
 Returns the current options bitmask; mask with the option you're
 interested in to see if it is set:
@@ -126,20 +134,58 @@ interested in to see if it is set:
       die "SSL v2 was not disabled!";
   }
 
-=head2 load_verify_locations($filename, $path)
+=item B<load_verify_locations($filename, $path)>
 
 Specify where CA certificates in PEM format are to be found.
 C<$filename> is a single file containing one or more certificates.
 C<$path> refers to a directory with C<9d66eef0.1> etc files as would
 be made by L<c_rehash>.  See L<SSL_CTX_load_verify_locations(3ssl)>.
 
-=head2 set_verify($mode, [$verify_callback])
+=item B<set_default_verify_paths()>
+
+Sets up system-dependent certificate store location.  This is probably
+quite a good default.
+
+=item B<set_verify($mode, [$verify_callback])>
 
 Mode should be either VERIFY_NONE, or a combination of VERIFY_PEER,
 VERIFY_CLIENT_ONCE and/or VERIFY_FAIL_IF_NO_PEER_CERT.  If you don't
 set this as a server, you cannot later call
 C<-E<gt>get_peer_certificate> to find out if the client configured a
-certificate.
+certificate (though there are references to repeating SSL negotiation,
+eg in L<SSL_read(3ssl)>, not sure how this is performed though).
+
+During the handshake phase, the $verify_callback is called once for
+every certificate in the chain of the peer, starting with the root
+certificate.  Each time, it is passed two arguments: the first a
+boolean (1 or 0) which indicates whether the in-built certificate
+verification passed, and the second argument is the actual
+B<certficate> which is being verified (a L<Net::SSLeay::X509> object).
+Note this is different to the calling convention of OpenSSL and
+Net::SSLeay, which instead (logically, anyway) pass a
+L<Net::SSLeay::X509::Context> object.  However there is little of
+interest in this other object, so for convenience the current
+certificate is passed instead as the second object.  The
+L<Net::SSLeay::X509::Context> is passed as a third argument should you
+need it.
+
+The passed L<Net::SSLeay::X509> object will not work outside of the
+callback; get everything out of it that you need inside it, or use the
+C<get_peer_certificate> method of L<Net::SSLeay::SSL> later.
+
+Example:
+
+   my @names;
+   $ctx->set_verify(VERIFY_PEER, sub {
+       my ($ok, $x509) = @_;
+       push @names, $x509->subject_name->cn;
+       return $ok;
+   });
+
+   $ssl = $ctx->new_ssl($fd);
+   $ssl->accept();
+
+   print "Client identity chain: @names\n";
 
 =cut
 
@@ -160,7 +206,8 @@ sub set_verify {
 				x509_store_ctx => $x509_store_ctx,
 				);
 			my $cert = $x509_ctx->get_current_cert;
-			$callback->($preverify_ok, $cert);
+			$callback->($preverify_ok, $cert, $x509_ctx);
+			$cert->free;
 		}
 		else {
 			$preverify_ok;
@@ -179,27 +226,88 @@ sub _set_verify {
 	Net::SSLeay::CTX_set_verify($ctx, $mode, $real_cb);
 }
 
-=head2 use_certificate_file($filename, $type)
+=item use_certificate_file($filename, $type)
 
 C<$filename> is the name of a local file.  This becomes your local
 cert - client or server.
 
 C<$type> may be FILETYPE_PEM or FILETYPE_ASN1.
 
-=head2 use_certificate_chain_file($filename)
+=item use_certificate_chain_file($filename)
 
 C<$filename> is the name of a local PEM file, containing a chain of
-certificates which lead back to a valid root certificate.  This is
-probably the option you really should use for flexible (albeit PEM
-only) use.
+certificates which lead back to a valid root certificate.  In general,
+this is the more useful method of loading a certificate.
 
-=head2 use_PrivateKey_file($filename, $type);
+=item use_PrivateKey_file($filename, $type);
 
 If using a certificate, you need to specify the private key of the end
 of the chain.  Specify it here; set C<$type> as with
 C<use_certificate_file>
 
+=back
+
+=head2 Setup methods
+
+=over
+
+=item B<set_mode($mode)>
+
+=item B<get_mode>
+
+Sets/gets the mode of SSL objects created from this context.  See
+L<SSL_set_mode(3ssl)>.  This is documented more fully at
+L<Net::SSLeay::SSL/set_mode>
+
+=back
+
+=head2 Handshake/SSL session methods
+
+=over
+
+=item B<new_ssl($socket)>
+
+Makes a new L<Net::SSLeay::SSL> object using this Context, and attach
+it to the given socket (if passed).
+
 =cut
+
+sub new_ssl {
+	my $self = shift;
+	my $socket = shift;
+	my $ssl = Net::SSLeay::SSL->new( ctx => $self );
+	if ( $socket ) {
+		$ssl->set_fd(fileno($socket));
+	}
+	$ssl;
+}
+
+=item B<connect($socket)>
+
+=item B<accept($socket)>
+
+Further convenience methods, which create a new L<Net::SSLeay::SSL>
+object, wire it up to the passed socket, then call either C<connect>
+or C<accept>.  Returns the L<Net::SSLeay::SSL> object.
+
+=cut
+
+sub connect {
+	my $self = shift;
+	my $ssl = $self->new_ssl(@_);
+	$ssl->connect();
+}
+
+sub accept {
+	my $self = shift;
+	my $ssl = $self->new_ssl(@_);
+	$ssl->accept();
+}
+
+=back
+
+=cut
+
 
 sub get_cert_store {
 	my $self = shift;
@@ -214,6 +322,80 @@ use Net::SSLeay::Functions "ctx";
 1;
 
 __END__
+
+=head2 un-triaged
+
+The following methods were defined in Net::SSLeay 1.35, and may work
+via this interface.
+
+ v2_new()
+ v3_new()
+ v23_new()
+ tlsv1_new()
+ new_with_method(meth)
+ add_session(ctx,ses)
+ remove_session(ctx,ses)
+ flush_sessions(ctx,tm)
+ use_RSAPrivateKey_file(ctx,file,type)
+ set_cipher_list(s,str)
+ ctrl(ctx,cmd,larg,parg)
+ get_options(ctx)
+ set_options(ctx,op)
+ sessions(ctx)
+ sess_number(ctx)
+ sess_connect(ctx)
+ sess_connect_good(ctx)
+ sess_connect_renegotiate(ctx)
+ sess_accept(ctx)
+ sess_accept_renegotiate(ctx)
+ sess_accept_good(ctx)
+ sess_hits(ctx)
+ sess_cb_hits(ctx)
+ sess_misses(ctx)
+ sess_timeouts(ctx)
+ sess_cache_full(ctx)
+ sess_get_cache_size(ctx)
+ sess_set_cache_size(ctx,size)
+ add_client_CA(ctx,x)
+ callback_ctrl(ctx,i,fp)
+ check_private_key(ctx)
+ get_ex_data(ssl,idx)
+ get_quiet_shutdown(ctx)
+ get_timeout(ctx)
+ get_verify_depth(ctx)
+ get_verify_mode(ctx)
+ set_cert_store(ctx,store)
+ get_cert_store(ctx)
+ set_cert_verify_callback(ctx,func,data=NULL)
+ set_client_CA_list(ctx,list)
+ set_default_passwd_cb(ctx,func=NULL)
+ set_default_passwd_cb_userdata(ctx,u=NULL)
+ set_ex_data(ssl,idx,data)
+ set_purpose(s,purpose)
+ set_quiet_shutdown(ctx,mode)
+ set_ssl_version(ctx,meth)
+ set_timeout(ctx,t)
+ set_trust(s,trust)
+ set_verify_depth(ctx,depth)
+ use_RSAPrivateKey(ctx,rsa)
+ get_ex_new_index(argl,argp,new_func,dup_func,free_func)
+ set_session_id_context(ctx,sid_ctx,sid_ctx_len)
+ set_tmp_rsa_callback(ctx, cb)
+ set_tmp_dh_callback(ctx, dh)
+ add_extra_chain_cert(ctx,x509)
+ get_app_data(ctx)
+ get_mode(ctx)
+ get_read_ahead(ctx)
+ get_session_cache_mode(ctx)
+ need_tmp_RSA(ctx)
+ set_app_data(ctx,arg)
+ set_mode(ctx,op)
+ set_read_ahead(ctx,m)
+ set_session_cache_mode(ctx,m)
+ set_tmp_dh(ctx,dh)
+ set_tmp_rsa(ctx,rsa)
+
+=cut
 
 # Local Variables:
 # mode:cperl
