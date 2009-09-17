@@ -77,11 +77,14 @@ sub import {
 			sub {
 				my $self = shift;
 				my @rv;
+				my $pointer = $self->$att
+					or die "no pointer in $self; this"
+		." object may be being used outside of its valid lifetime";
 				if ( wantarray ) {
-					@rv = $code->($self->$att, @_);
+					@rv = $code->($pointer, @_);
 				}
 				else {
-					$rv[0] = $code->($self->$att, @_);
+					$rv[0] = $code->($pointer, @_);
 				}
 				&Net::SSLeay::Error::die_if_ssl_error($method);
 				wantarray ? @rv : $rv[0];
