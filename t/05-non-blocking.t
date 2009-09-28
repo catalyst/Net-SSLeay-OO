@@ -23,25 +23,28 @@ my $ctx = Net::SSLeay::Context->new;
 our $DEBUG = $ENV{DEBUG_SSL};
 
 use Net::SSLeay::Constants qw(ERROR_WANT_READ ERROR_WANT_WRITE
-			      ERROR_NONE ERROR_WANT_CONNECT
-			      FILETYPE_PEM
-			      MODE_ENABLE_PARTIAL_WRITE
-			      MODE_ACCEPT_MOVING_WRITE_BUFFER );
+	ERROR_NONE ERROR_WANT_CONNECT
+	FILETYPE_PEM
+	MODE_ENABLE_PARTIAL_WRITE
+	MODE_ACCEPT_MOVING_WRITE_BUFFER );
 
-$ctx->set_default_passwd_cb(sub { "secr1t" });
+$ctx->set_default_passwd_cb( sub {"secr1t"} );
 
 my $client = Net::SSLeay::SSL->new( ctx => $ctx );
 my $server = Net::SSLeay::SSL->new( ctx => $ctx );
-$server->use_certificate_file("$Bin/certs/server-cert.pem", FILETYPE_PEM);
-$server->use_PrivateKey_file("$Bin/certs/server-key.pem", FILETYPE_PEM);
+$server->use_certificate_file( "$Bin/certs/server-cert.pem", FILETYPE_PEM );
+$server->use_PrivateKey_file( "$Bin/certs/server-key.pem", FILETYPE_PEM );
 
-pipe(RS, WC) or die $!;
-pipe(RC, WS) or die $!;
+pipe( RS, WC ) or die $!;
+pipe( RC, WS ) or die $!;
 
-$client->set_rfd(fileno(RC)); $client->set_wfd(fileno(WC));
-$server->set_rfd(fileno(RS)); $server->set_wfd(fileno(WS));
+$client->set_rfd( fileno(RC) );
+$client->set_wfd( fileno(WC) );
+$server->set_rfd( fileno(RS) );
+$server->set_wfd( fileno(WS) );
 
-$_->blocking(0) for (\*RS, \*WS, \*RC, \*WC);
+$_->blocking(0) for ( \*RS, \*WS, \*RC, \*WC );
+
 # SSL_MODE_* not imported by Net::SSLeay
 #  SSL_MODE_ENABLE_PARTIAL_WRITE - write single SSL records at a time.
 #  SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER - ``This is not the default to
@@ -55,13 +58,15 @@ $client->set_mode($mode);
 $client->set_connect_state;
 $server->set_accept_state;
 my $needy;
+
 #diag("about to handshake with self");
 do {
 	$needy = 0;
 	for my $x ( $client, $server ) {
+
 		#diag("$x->do_handshake");
 		my $error = $x->do_handshake;
-		if ( $error ) {
+		if ($error) {
 			my $want = $x->get_error($error);
 			if ( $want == ERROR_WANT_READ ) {
 				$needy = 1;
@@ -73,18 +78,18 @@ do {
 			}
 		}
 	}
-}
-	while ($needy);
+} while ($needy);
 
 pass("Successfully shook hands with self");
 
-my $data = "Some example data\n" x (1024 * 5);  # just too big for 1 SSL/TLS record
+my $data = "Some example data\n" x ( 1024 * 5 )
+	;    # just too big for 1 SSL/TLS record
 
 $client->write("GET /\r\n\r\n");
 my $req = $server->read;
 
-my $o = 0;
-my $l = length $data;
+my $o          = 0;
+my $l          = length $data;
 my $bytes_read = 0;
 my @read_chunks;
 my $writes;
@@ -92,12 +97,14 @@ my $retry;
 while ( $bytes_read < $l ) {
 	if ( $o < $l ) {
 		$retry ||= sub {
-			diag("attempting to write ".($l-$o)." bytes")
+			diag(             "attempting to write "
+					. ( $l - $o )
+					. " bytes" )
 				if $DEBUG;
-			$server->write(substr($data, $o, ($l-$o)));
+			$server->write( substr( $data, $o, ( $l - $o ) ) );
 		};
 		my $written = $retry->();
-		if ( $written > 0) {
+		if ( $written > 0 ) {
 			diag("wrote $written bytes")
 				if $DEBUG;
 			$writes++;
@@ -113,9 +120,9 @@ while ( $bytes_read < $l ) {
 	}
 }
 
-is($bytes_read, $l, "Got all data back");
-is(join("", @read_chunks), $data, "Data the same");
-cmp_ok($writes, ">", 1, "More than one write was needed");
+is( $bytes_read, $l, "Got all data back" );
+is( join( "", @read_chunks ), $data, "Data the same" );
+cmp_ok( $writes, ">", 1, "More than one write was needed" );
 
 # Local Variables:
 # mode:cperl

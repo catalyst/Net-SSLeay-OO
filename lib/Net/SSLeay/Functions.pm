@@ -4,57 +4,61 @@ package Net::SSLeay::Functions;
 use Net::SSLeay;
 
 my %prefixes = (
-	"" => "Net::SSLeay::SSL",
-	BIO => "Net::SSLeay::BIO",
-	CIPHER => "Net::SSLeay::Cipher",
-	COMP => "Net::SSLeay::Compression",
-	CTX => "Net::SSLeay::Context",
-	DH => "Net::SSLeay::KeyType::DH",
-	ENGINE => "Net::SSLeay::Engine",
-	ERR => "Net::SSLeay::Error",
+	""       => "Net::SSLeay::SSL",
+	BIO      => "Net::SSLeay::BIO",
+	CIPHER   => "Net::SSLeay::Cipher",
+	COMP     => "Net::SSLeay::Compression",
+	CTX      => "Net::SSLeay::Context",
+	DH       => "Net::SSLeay::KeyType::DH",
+	ENGINE   => "Net::SSLeay::Engine",
+	ERR      => "Net::SSLeay::Error",
 	EVP_PKEY => "Net::SSLeay::PrivateKey",
+
 	#MD2 => undef,
 	#MD4 => undef,
 	#MD5 => undef,
 	PEM => "Net::SSLeay::PEM",
+
 	#P_ASN1_UTCTIME => undef,
-	RAND => "Net::SSLeay::PRNG",
-	RSA => "Net::SSLeay::KeyType::RSA",
+	RAND    => "Net::SSLeay::PRNG",
+	RSA     => "Net::SSLeay::KeyType::RSA",
 	SESSION => "Net::SSLeay::Session",
+
 	#X509V3_EXT => undef,
-	X509_NAME => "Net::SSLeay::X509::Name",
-	X509_STORE => "Net::SSLeay::X509::Store",
+	X509_NAME      => "Net::SSLeay::X509::Name",
+	X509_STORE     => "Net::SSLeay::X509::Store",
 	X509_STORE_CTX => "Net::SSLeay::X509::Context",
-	X509 => "Net::SSLeay::X509",
-	);
+	X509           => "Net::SSLeay::X509",
+);
 
 my %ready;
 
-while ( my ($sym, $glob) = each %Net::SSLeay:: ) {
+while ( my ( $sym, $glob ) = each %Net::SSLeay:: ) {
 	my $display = $sym =~ /ERRZX/;
 	print STDERR "Considering $sym: " if $display;
-	my ($sub_pkg, $method) =
+	my ( $sub_pkg, $method ) =
 		$sym =~ m{^(?:([A-Z][A-Z0-9]*(?:_[A-Z][A-Z0-9]*)*)_)?
 			  ([a-z]\w+)$}x;
 	if ( !$method ) {
-		print STDERR "didn't match pattern, next\n" if $display;;
+		print STDERR "didn't match pattern, next\n" if $display;
 		next;
 	}
 	use Data::Dumper;
-	if ( ! *{"Net::SSLeay::$sym"}{CODE} ) {
-		print STDERR "not a func, next\n" if $display;;
+	if ( !*{"Net::SSLeay::$sym"}{CODE} ) {
+		print STDERR "not a func, next\n" if $display;
 		next;
 	}
-	if ($method eq "new") {
-		print STDERR "it's 'new', next\n" if $display;;
+	if ( $method eq "new" ) {
+		print STDERR "it's 'new', next\n" if $display;
 		next;
 	}
-	my $pkg = $prefixes{$sub_pkg||""};
-	if (!$pkg) {
-		print STDERR "destination package undefined; next\n" if $display;;
+	my $pkg = $prefixes{ $sub_pkg || "" };
+	if ( !$pkg ) {
+		print STDERR "destination package undefined; next\n"
+			if $display;
 		next;
 	}
-	print STDERR " => belongs in $pkg as $method\n" if $display;;
+	print STDERR " => belongs in $pkg as $method\n" if $display;
 	if ( *{$glob}{CODE} ) {
 		$ready{$pkg}{$method} = \&{*$glob};
 	}
@@ -66,41 +70,42 @@ while ( my ($sym, $glob) = each %Net::SSLeay:: ) {
 }
 
 sub import {
-	my $pkg = shift;
-	my $caller = caller;
-	my $install = shift || sub{ shift };
+	my $pkg     = shift;
+	my $caller  = caller;
+	my $install = shift || sub {shift};
 	if ( !ref $install ) {
 		my $att = $install;
 		$install = sub {
-			my $code = shift;
+			my $code   = shift;
 			my $method = shift;
 			sub {
 				my $self = shift;
 				my @rv;
 				my $pointer = $self->$att
 					or die "no pointer in $self; this"
-		." object may be being used outside of its valid lifetime";
-				if ( wantarray ) {
-					@rv = $code->($pointer, @_);
+					. " object may be being used outside of its valid lifetime";
+				if (wantarray) {
+					@rv = $code->( $pointer, @_ );
 				}
 				else {
-					$rv[0] = $code->($pointer, @_);
+					$rv[0] = $code->( $pointer, @_ );
 				}
-				&Net::SSLeay::Error::die_if_ssl_error($method);
+				&Net::SSLeay::Error::die_if_ssl_error(
+					$method);
 				wantarray ? @rv : $rv[0];
 			};
 		};
 	}
 	if ( my $table = delete $ready{$caller} ) {
-		while ( my ($method, $code) = each %$table ) {
-			my $fullname = $caller."::".$method;
+		while ( my ( $method, $code ) = each %$table ) {
+			my $fullname = $caller . "::" . $method;
 			next if defined &{$fullname};
 			print STDERR "installing $method into $caller\n"
 				if $caller =~ /ErrorZZ/;
-			*{$fullname} = $install->($code, $method);
+			*{$fullname} = $install->( $code, $method );
 		}
 	}
-};
+}
 
 1;
 

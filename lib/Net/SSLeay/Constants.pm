@@ -34,38 +34,40 @@ are hard-coded for the event that Net::SSLeay doesn't export them.
 our $VERSION = "0.01";
 
 our %FALLBACK;
+
 BEGIN {
 	%FALLBACK = (
-		MODE_ENABLE_PARTIAL_WRITE => 1,
+		MODE_ENABLE_PARTIAL_WRITE       => 1,
 		MODE_ACCEPT_MOVING_WRITE_BUFFER => 2,
-		MODE_AUTO_RETRY => 4,
-		MODE_NO_AUTO_CHAIN => 8,
-		);
+		MODE_AUTO_RETRY                 => 4,
+		MODE_NO_AUTO_CHAIN              => 8,
+	);
 }
 
 sub import {
-	my $class = shift;
+	my $class  = shift;
 	my $target = caller;
 	while ( my $thingy = shift ) {
 		if ( $thingy =~ m{^\d+} ) {
 			no warnings "numeric";
 			die "insufficient version $thingy"
-				if 0+$thingy < 0+$VERSION;
+				if 0 + $thingy < 0 + $VERSION;
 		}
 		else {
 			no strict 'refs';
 			my $val = eval { &{"Net::SSLeay::$thingy"}() };
 			if ( defined $val ) {
-				*{$target."::".$thingy} = sub() { $val };
+				*{ $target . "::" . $thingy } = sub() {$val};
 			}
 			elsif ( exists $FALLBACK{$thingy} ) {
 				$val = $FALLBACK{$thingy};
-				*{$target."::".$thingy} = sub() {
-					$val
+				*{ $target . "::" . $thingy } = sub() {
+					$val;
 				};
 			}
 			else {
-				die "tried to import '$thingy', but SSLeay said: $@";
+				die
+					"tried to import '$thingy', but SSLeay said: $@";
 			}
 		}
 	}

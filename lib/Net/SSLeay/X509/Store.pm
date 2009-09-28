@@ -10,12 +10,10 @@ package Net::SSLeay::X509::Store;
 # have received a copy of the Artistic License the file COPYING.txt.
 # If not, see <http://www.perlfoundation.org/artistic_license_2_0>
 
-
 use Moose;
 
-has 'x509_store' =>
-	isa => 'Int',
-	is => "ro",
+has 'x509_store' => isa => 'Int',
+	is       => "ro",
 	required => 1,
 	;
 

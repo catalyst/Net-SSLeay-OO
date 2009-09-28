@@ -3,9 +3,8 @@ package Net::SSLeay::Session;
 
 use Moose;
 
-has 'session' =>
-	isa => 'Int',
-	is => "ro",
+has 'session'    => isa => 'Int',
+	is       => "ro",
 	required => 1,
 	;
 
@@ -13,7 +12,7 @@ use Net::SSLeay::Functions 'session';
 
 sub DESTROY {
 	my $self = shift;
-        $self->free;
+	$self->free;
 }
 
 1;

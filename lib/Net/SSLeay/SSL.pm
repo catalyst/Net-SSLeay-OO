@@ -43,14 +43,13 @@ The raw *SSL pointer.  Use at your own risk.
 
 =cut
 
-has 'ssl' =>
-	isa => "Int",
-	is => "ro",
+has 'ssl'        => isa => "Int",
+	is       => "ro",
 	required => 1,
-	lazy => 1,
-	default => sub {
-		my $self = shift;
-		Net::SSLeay::new($self->ctx->ctx);
+	lazy     => 1,
+	default  => sub {
+	my $self = shift;
+	Net::SSLeay::new( $self->ctx->ctx );
 	},
 	;
 
@@ -61,12 +60,11 @@ on creation of the Net::SSLeay::SSL.
 
 =cut
 
-has 'ctx' =>
-	isa => "Net::SSLeay::Context",
-	is => "ro",
+has 'ctx'        => isa => "Net::SSLeay::Context",
+	is       => "ro",
 	required => 1,
-	default => sub {
-		Net::SSLeay::Context->new();
+	default  => sub {
+	Net::SSLeay::Context->new();
 	},
 	;
 
@@ -127,21 +125,21 @@ C<use_certificate_chain_file()> and C<set_default_cb_passwd()>
 
 =cut
 
-has 'verify_cb',
-	is => "ro";
-BEGIN{
+has 'verify_cb', is => "ro";
+
+BEGIN {
 	no strict 'refs';
 	*$_ = \&{"Net::SSLeay::Context::$_"}
 		for qw(set_verify use_certificate);
 }
 
 sub _set_verify {
-	my $self = shift;
-	my $mode = shift;
+	my $self    = shift;
+	my $mode    = shift;
 	my $real_cb = shift;
-	my $ssl = $self->ssl;
+	my $ssl     = $self->ssl;
 	$self->{verify_cb} = $real_cb;
-	Net::SSLeay::set_verify($ssl, $mode, $real_cb);
+	Net::SSLeay::set_verify( $ssl, $mode, $real_cb );
 }
 
 =head2 Setup methods
@@ -292,10 +290,10 @@ during handshake with C<set_verify>.
 
 sub get_peer_certificate {
 	my $self = shift;
-	my $x509 = Net::SSLeay::get_peer_certificate($self->ssl);
+	my $x509 = Net::SSLeay::get_peer_certificate( $self->ssl );
 	&Net::SSLeay::Error::die_if_ssl_error("get_peer_certificate");
-	if ( $x509 ) {
-		Net::SSLeay::X509->new(x509 => $x509);
+	if ($x509) {
+		Net::SSLeay::X509->new( x509 => $x509 );
 	}
 }
 
@@ -315,17 +313,17 @@ passing a Net::SSLeay::Session object.
 sub get_session {
 	my $self = shift;
 	require Net::SSLeay::Session;
-	my $sessid = Net::SSLeay::get1_session($self->ssl);
+	my $sessid = Net::SSLeay::get1_session( $self->ssl );
 	&Net::SSLeay::Error::die_if_ssl_error("get_session");
-	if ( $sessid ) {
-		Net::SSLeay::Session->new(session => $sessid);
+	if ($sessid) {
+		Net::SSLeay::Session->new( session => $sessid );
 	}
 }
 
 sub set_session {
-	my $self = shift;
+	my $self    = shift;
 	my $session = shift;
-	Net::SSLeay::set_session($self->ssl, $session->session);
+	Net::SSLeay::set_session( $self->ssl, $session->session );
 	&Net::SSLeay::Error::die_if_ssl_error("set_session");
 }
 
@@ -431,12 +429,13 @@ OpenSSL or Net::SSLeay ruin your day.
 # man page for them, or because they were marked as not for general
 # consumption.
 
-use Net::SSLeay::Functions 'ssl',
-	-exclude => [qw( get_time set_time get_timeout set_timeout
-			 set_bio get_rbio get_wbio get0_session
-			 get1_session ctrl callback_ctrl state
-			 set_ssl_method get_ssl_method
-		       )];
+use Net::SSLeay::Functions 'ssl', -exclude => [
+	qw( get_time set_time get_timeout set_timeout
+		set_bio get_rbio get_wbio get0_session
+		get1_session ctrl callback_ctrl state
+		set_ssl_method get_ssl_method
+		)
+];
 
 1;
 

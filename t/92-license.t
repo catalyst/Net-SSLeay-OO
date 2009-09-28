@@ -3,7 +3,8 @@
 use strict;
 use Test::More;
 plan skip_all => 'set TEST_LICENSE or TEST_ALL to enable this test'
-	unless $ENV{TEST_LICENSE} or $ENV{TEST_ALL};
+	unless $ENV{TEST_LICENSE}
+		or $ENV{TEST_ALL};
 plan "no_plan";
 
 use FindBin qw($Bin);

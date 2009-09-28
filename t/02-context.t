@@ -9,47 +9,47 @@
 # have received a copy of the Artistic License the file COPYING.txt.
 # If not, see <http://www.perlfoundation.org/artistic_license_2_0>
 
-
 use strict;
 use Test::More qw(no_plan);
 use FindBin qw($Bin);
 
 BEGIN {
-      use_ok("Net::SSLeay::Context");
+	use_ok("Net::SSLeay::Context");
 }
 
-use Net::SSLeay::Constants  qw(OP_ALL VERIFY_NONE FILETYPE_PEM);
+use Net::SSLeay::Constants qw(OP_ALL VERIFY_NONE FILETYPE_PEM);
 
 my $destroyed;
 my $ctx_id;
 {
 	my $ctx = Net::SSLeay::Context->new;
 
-	isa_ok($ctx, "Net::SSLeay::Context", "new Net::SSLeay::Context");
+	isa_ok( $ctx, "Net::SSLeay::Context", "new Net::SSLeay::Context" );
 
 	$ctx_id = $ctx->ctx;
-	ok($ctx_id, "has a ctx");
+	ok( $ctx_id, "has a ctx" );
 
 	$ctx->set_options(OP_ALL);
-	is($ctx->get_options, OP_ALL,
-	   "takes options like a good little ctx");
+	is( $ctx->get_options, OP_ALL,
+		"takes options like a good little ctx" );
 
-	$ctx->load_verify_locations("", "$Bin/certs");
+	$ctx->load_verify_locations( "", "$Bin/certs" );
 
 	eval {
-		$ctx->use_certificate_chain_file
-			("$Bin/certs/no-such-server-cert.pem");
+		$ctx->use_certificate_chain_file(
+			"$Bin/certs/no-such-server-cert.pem");
 	};
-	isa_ok($@, "Net::SSLeay::Error", "exception");
-		#&& diag $@;
+	isa_ok( $@, "Net::SSLeay::Error", "exception" );
 
-	$ctx->set_default_passwd_cb(sub { "secr1t" });
-	$ctx->use_PrivateKey_file
-		("$Bin/certs/server-key.pem", FILETYPE_PEM);
+	#&& diag $@;
+
+	$ctx->set_default_passwd_cb( sub {"secr1t"} );
+	$ctx->use_PrivateKey_file( "$Bin/certs/server-key.pem",
+		FILETYPE_PEM );
 	$ctx->use_certificate_chain_file("$Bin/certs/server-cert.pem");
 
 	my $store = $ctx->get_cert_store;
-	isa_ok($store, "Net::SSLeay::X509::Store", "get_cert_store()");
+	isa_ok( $store, "Net::SSLeay::X509::Store", "get_cert_store()" );
 
 	my $old_sub = \&Net::SSLeay::Context::free;
 	no warnings 'redefine';
@@ -58,7 +58,7 @@ my $ctx_id;
 		$old_sub->(@_);
 	};
 }
-is($destroyed, $ctx_id, "Called CTX_free");
+is( $destroyed, $ctx_id, "Called CTX_free" );
 
 # Local Variables:
 # mode:cperl

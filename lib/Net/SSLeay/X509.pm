@@ -3,15 +3,13 @@ package Net::SSLeay::X509;
 
 use Moose;
 
-has 'x509' =>
-	isa => 'Int',
-	is => "ro",
+has 'x509'       => isa => 'Int',
+	is       => "ro",
 	required => 1,
 	;
 
-has 'no_rvinc' =>
-	isa => "Bool",
-	is => "ro",
+has 'no_rvinc' => isa => "Bool",
+	is     => "ro",
 	;
 
 sub DESTROY {
@@ -20,7 +18,7 @@ sub DESTROY {
 }
 
 sub free {
-	my $self = shift;
+	my $self    = shift;
 	my $pointer = delete $self->{x509};
 	unless ( !$pointer or $self->no_rvinc ) {
 		Net::SSLeay::free($pointer);
@@ -35,13 +33,13 @@ sub free {
 
 BEGIN {
 	no strict 'refs';
-	for my $nameFunc ( qw(subject_name issuer_name) ) {
-		my $get = "get_$nameFunc";
+	for my $nameFunc (qw(subject_name issuer_name)) {
+		my $get     = "get_$nameFunc";
 		my $sslfunc = "Net::SSLeay::X509_$get";
 		*$get = sub {
 			my $self = shift;
 			require Net::SSLeay::X509::Name;
-			my $name = &$sslfunc($self->x509);
+			my $name = &$sslfunc( $self->x509 );
 			Net::SSLeay::X509::Name->new( x509_name => $name );
 		};
 	}

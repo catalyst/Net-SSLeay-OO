@@ -48,10 +48,10 @@ that a Net::SSLeay::Context object is instantiated.
 
 =cut
 
-has 'ctx' =>
+has 'ctx' => (
+	is  => "ro",
 	isa => "Int",
-	is => "ro",
-	;
+);
 
 =head1 ATTRIBUTES
 
@@ -77,10 +77,10 @@ This option must be specified at object creation time.
 
 =cut
 
-has 'ssl_version' =>
+has 'ssl_version' => (
+	is  => "ro",
 	isa => "Int",
-	is => "ro",
-	;
+);
 
 our $INITIALIZED;
 
@@ -91,8 +91,8 @@ sub BUILD {
 		Net::SSLeay::SSLeay_add_ssl_algorithms();
 		Net::SSLeay::randomize();
 	}
-	if ( ! $self->ctx ) {
-		my $ctx = Net::SSLeay::new_x_ctx($self->ssl_version);
+	if ( !$self->ctx ) {
+		my $ctx = Net::SSLeay::new_x_ctx( $self->ssl_version );
 		$self->{ctx} = $ctx;
 		$self->set_default_verify_paths;
 	}
@@ -191,39 +191,39 @@ Example:
 
 use Net::SSLeay::Constants qw(VERIFY_NONE);
 
-has 'verify_cb',
-	is => "ro";
+has 'verify_cb', is => "ro";
 
 sub set_verify {
-	my $self = shift;
-	my $mode = shift;
+	my $self     = shift;
+	my $mode     = shift;
 	my $callback = shift;
+
 	# always set a callback, unless VERIFY_NONE "is set"
 	my $real_cb = $mode == VERIFY_NONE ? undef : sub {
-		my ($preverify_ok, $x509_store_ctx) = @_;
-		if ( $callback ) {
-			my $x509_ctx = Net::SSLeay::X509::Context->new(
-				x509_store_ctx => $x509_store_ctx,
-				);
+		my ( $preverify_ok, $x509_store_ctx ) = @_;
+		if ($callback) {
+			my $x509_ctx =
+				Net::SSLeay::X509::Context->new(
+				x509_store_ctx => $x509_store_ctx, );
 			my $cert = $x509_ctx->get_current_cert;
-			$callback->($preverify_ok, $cert, $x509_ctx);
+			$callback->( $preverify_ok, $cert, $x509_ctx );
 			$cert->free;
 		}
 		else {
 			$preverify_ok;
 		}
 	};
-	$self->_set_verify($mode, $real_cb);
+	$self->_set_verify( $mode, $real_cb );
 	&Net::SSLeay::Error::die_if_ssl_error("set_verify");
 }
 
 sub _set_verify {
-	my $self = shift;
-	my $mode = shift;
+	my $self    = shift;
+	my $mode    = shift;
 	my $real_cb = shift;
-	my $ctx = $self->ctx;
+	my $ctx     = $self->ctx;
 	$self->{verify_cb} = $real_cb;
-	Net::SSLeay::CTX_set_verify($ctx, $mode, $real_cb);
+	Net::SSLeay::CTX_set_verify( $ctx, $mode, $real_cb );
 }
 
 =item use_certificate_file($filename, $type)
@@ -273,11 +273,11 @@ it to the given socket (if passed).
 =cut
 
 sub new_ssl {
-	my $self = shift;
+	my $self   = shift;
 	my $socket = shift;
-	my $ssl = Net::SSLeay::SSL->new( ctx => $self );
-	if ( $socket ) {
-		$ssl->set_fd(fileno($socket));
+	my $ssl    = Net::SSLeay::SSL->new( ctx => $self );
+	if ($socket) {
+		$ssl->set_fd( fileno($socket) );
 	}
 	$ssl;
 }
@@ -294,13 +294,13 @@ or C<accept>.  Returns the L<Net::SSLeay::SSL> object.
 
 sub connect {
 	my $self = shift;
-	my $ssl = $self->new_ssl(@_);
+	my $ssl  = $self->new_ssl(@_);
 	$ssl->connect();
 }
 
 sub accept {
 	my $self = shift;
-	my $ssl = $self->new_ssl(@_);
+	my $ssl  = $self->new_ssl(@_);
 	$ssl->accept();
 }
 
@@ -316,12 +316,11 @@ Returns the L<Net::SSLeay::X509::Store> associated with this context.
 
 =cut
 
-
 sub get_cert_store {
 	my $self = shift;
 	require Net::SSLeay::X509::Store;
-	my $store = Net::SSLeay::CTX_get_cert_store($self->ctx),
-	&Net::SSLeay::Error::die_if_ssl_error("get_cert_store");
+	my $store = Net::SSLeay::CTX_get_cert_store( $self->ctx ),
+		&Net::SSLeay::Error::die_if_ssl_error("get_cert_store");
 	Net::SSLeay::X509::Store->new( x509_store => $store );
 }
 

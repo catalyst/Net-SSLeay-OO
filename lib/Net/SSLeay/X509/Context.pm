@@ -12,21 +12,19 @@ package Net::SSLeay::X509::Context;
 
 use Moose;
 
-has 'x509_store_ctx' =>
-	isa => 'Int',
-	is => "ro",
-	required => 1,
+has 'x509_store_ctx' => isa => 'Int',
+	is           => "ro",
+	required     => 1,
 	;
 
 sub get_current_cert {
 	my $self = shift;
 	my $x509 = Net::SSLeay::X509_STORE_CTX_get_current_cert(
-		$self->x509_store_ctx,
-		);
+		$self->x509_store_ctx, );
 	&Net::SSLeay::Error::die_if_ssl_error("get_current_cert");
-	if ( $x509 ) {
+	if ($x509) {
 		require Net::SSLeay::X509;
-		Net::SSLeay::X509->new(x509 => $x509, no_rvinc => 1);
+		Net::SSLeay::X509->new( x509 => $x509, no_rvinc => 1 );
 	}
 }
 

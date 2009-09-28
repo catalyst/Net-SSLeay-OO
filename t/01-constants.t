@@ -14,15 +14,16 @@ use strict;
 use Test::More qw(no_plan);
 
 BEGIN {
-      use_ok("Net::SSLeay::Constants", "OP_ALL", "VERIFY_NONE",
-             "VERIFY_PEER");
+	use_ok( "Net::SSLeay::Constants", "OP_ALL",
+		"VERIFY_NONE",            "VERIFY_PEER"
+	);
 }
 
-ok(&OP_ALL, "Imported OP_ALL");
-cmp_ok(&VERIFY_PEER, '!=', &VERIFY_NONE, "Values are making some sense");
+ok( &OP_ALL, "Imported OP_ALL" );
+cmp_ok( &VERIFY_PEER, '!=', &VERIFY_NONE, "Values are making some sense" );
 
 eval { Net::SSLeay::Constants->import("OP_YO_MOMMA") };
-isnt($@, '', 'Trying to import bad symbol failed');
+isnt( $@, '', 'Trying to import bad symbol failed' );
 
 # Local Variables:
 # mode:cperl
