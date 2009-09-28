@@ -52,10 +52,17 @@ my $seen_untidy = 0;
 
 for my $file (@files) {
 	local (@ARGV);
+	my @tidy_opts;
+	if ( -f $perltidyrc ) {
+		push @tidy_opts, perltidyrc => $perltidyrc;
+	}
+	else {
+		push @tidy_opts, argv => "--perl-best-practices";
+	}
 	Perl::Tidy::perltidy(
 		source      => $file,
 		destination => "$file.tidy",
-		perltidyrc  => $perltidyrc,
+		@tidy_opts,
 	);
 
 	my $rc = system( "diff -q $file $file.tidy &>/dev/null" );
