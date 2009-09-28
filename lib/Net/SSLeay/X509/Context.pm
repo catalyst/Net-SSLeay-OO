@@ -1,6 +1,15 @@
 
 package Net::SSLeay::X509::Context;
 
+# wrapper for X509_STORE_CTX* functions
+#
+# Copyright (C) 2009  NZ Registry Services
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the Artistic License 2.0 or later.  You should
+# have received a copy of the Artistic License the file COPYING.txt.
+# If not, see <http://www.perlfoundation.org/artistic_license_2_0>
+
 use Moose;
 
 has 'x509_store_ctx' =>
@@ -26,15 +35,18 @@ sub get_current_cert {
 
 use Net::SSLeay::Functions 'x509_store_ctx';
 
-# get_error()
-# get_error_depth()
-# get_ex_data()
-# set_cert()
-# set_error()
-# set_ex_data()
-# set_flags()
+# un-triaged:
+#   get_error()
+#   get_error_depth()
+#   get_ex_data()
+#   set_cert()
+#   set_error()
+#   set_ex_data()
+#   set_flags()
 
 1;
+
+__END__
 
 # Local Variables:
 # mode:cperl

@@ -442,13 +442,22 @@ use Net::SSLeay::Functions 'ssl',
 
 __END__
 
-=head1 AUTHOR AND LICENSE
+=head1 AUTHOR
 
-This module was written by Sam Vilain, L<samv@cpan.org>
+Sam Vilain, L<samv@cpan.org>
 
-Copyright 2009, NZ Registry Services.  This program is Free Software;
-you may use it under the terms of the Artistic License 2.0.  See
-L<Net::SSLeay::OO> for more information.
+=head1 COPYRIGHT
+
+Copyright (C) 2009  NZ Registry Services
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the Artistic License 2.0 or later.  You should
+have received a copy of the Artistic License the file COPYING.txt.  If
+not, see <http://www.perlfoundation.org/artistic_license_2_0>
+
+=head1 SEE ALSO
+
+L<Net::SSLeay::OO>, L<Net::SSLeay::Context>, L<Net::SSLeay::Session>
 
 =cut
 

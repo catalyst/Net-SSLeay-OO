@@ -1,6 +1,16 @@
 
 package Net::SSLeay::X509::Store;
 
+# wrapper for X509_STORE* functions
+#
+# Copyright (C) 2009  NZ Registry Services
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the Artistic License 2.0 or later.  You should
+# have received a copy of the Artistic License the file COPYING.txt.
+# If not, see <http://www.perlfoundation.org/artistic_license_2_0>
+
+
 use Moose;
 
 has 'x509_store' =>

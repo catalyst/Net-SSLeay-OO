@@ -1,4 +1,14 @@
 #!/usr/bin/perl -w
+#
+#  t/01-constants.t - test that constants are correctly exported
+#                     by Net::SSLeay::Constants
+#
+# Copyright (C) 2009  NZ Registry Services
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the Artistic License 2.0 or later.  You should
+# have received a copy of the Artistic License the file COPYING.txt.
+# If not, see <http://www.perlfoundation.org/artistic_license_2_0>
 
 use strict;
 use Test::More qw(no_plan);
