@@ -106,17 +106,17 @@ negotiations.
 
 =over
 
-=item B<set_options(OP_XXX & OP_XXX ...)>
+=item B<set_options( OP_XXX & OP_XXX ... )>
 
 =item B<get_options()>
 
-=item B<set_verify($mode, [$verify_callback])>
+=item B<set_verify( $mode, [$verify_callback] )>
 
-=item B<use_certificate(Net::SSLeay::X509 $cert)>
+=item B<use_certificate( Net::SSLeay::X509 $cert )>
 
-=item B<use_certificate_file($filename, $type)>
+=item B<use_certificate_file( $filename, $type )>
 
-=item B<use_PrivateKey_file($filename, $type)>
+=item B<use_PrivateKey_file( $filename, $type )>
 
 These functions are all very much the same as in
 C<Net::SSLeay::Context> but apply only to this SSL object.  Note that
@@ -151,26 +151,26 @@ it to filehandles and so on.
 
 =over
 
-=item B<set_fd(fileno($fh))>
+=item B<set_fd( fileno($fh) )>
 
-=item B<get_fd(fileno($fh))>
+=item B<get_fd( fileno($fh) )>
 
 Sets/Gets the file descriptor number for send and receive.
 
-=item B<set_rfd(fileno($fh))>
+=item B<set_rfd( fileno($fh) )>
 
-=item set_wfd(fileno($fh))>
+=item set_wfd( fileno($fh) )>
 
 Specify the file descriptors for send and receive independently.
 Useful when dealing with non-socket entities such as pipes.
 
-=item B<set_read_ahead($boolean)>
+=item B<set_read_ahead( $boolean )>
 
 =item B<get_read_ahead()>
 
 See L<SSL_set_read_ahead(3ssl)>
 
-=item B<set_mode($mode)>
+=item B<set_mode( $mode )>
 
 =item B<get_mode()>
 

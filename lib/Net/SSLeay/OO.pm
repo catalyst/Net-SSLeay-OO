@@ -7,6 +7,8 @@ use Net::SSLeay::Error;
 use Net::SSLeay::Context;
 use Net::SSLeay::SSL;
 
+our $VERSION = "0.01";
+
 1;
 
 __END__

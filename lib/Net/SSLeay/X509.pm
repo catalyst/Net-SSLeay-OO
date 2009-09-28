@@ -135,6 +135,12 @@ being a string representation of that name.
 These methods probably return validity period times for the
 certificate.  To be confirmed.
 
+=item B<free()>
+
+This method will cause the object to forget its internal pointer
+reference.  Use if you have been given a reference which is not
+refcounted, and the reference is going to expire soon.
+
 =back
 
 =head2 Arcane Internal Methods

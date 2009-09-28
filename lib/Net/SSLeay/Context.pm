@@ -306,6 +306,14 @@ sub accept {
 
 =back
 
+=head1 Informative methods
+
+=over
+
+=item B<get_cert_store()>
+
+Returns the L<Net::SSLeay::X509::Store> associated with this context.
+
 =cut
 
 
@@ -316,6 +324,10 @@ sub get_cert_store {
 	&Net::SSLeay::Error::die_if_ssl_error("get_cert_store");
 	Net::SSLeay::X509::Store->new( x509_store => $store );
 }
+
+=back
+
+=cut
 
 use Net::SSLeay::Functions "ctx";
 

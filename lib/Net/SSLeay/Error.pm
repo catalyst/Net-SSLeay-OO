@@ -165,13 +165,58 @@ message.  To represent this, the Net::SSLeay::Error object has a
 B<next> property, which represents a level further up the exception
 heirarchy.
 
+=head1 METHODS
+
+The following methods are defined (some via L<Moose> attributes):
+
+=over
+
+=item B<error_string()>
+
+Returns the error string from OpenSSL.
+
+=item B<as_string()>
+
+Returns the error string, turned into a marginally more user-friendly
+message.  Also available as the overloaded '""' operator (ie, when
+interpreted as a string you will get a message)
+
+=item B<error_code()>
+
+A fixed error code corresponding to the error.
+
+=item B<reason_string()>
+
+The human-readable part, or (apparently) "system lib" if the error is
+part of a stack trace.
+
+=item B<library_name()>
+
+=item B<function_name()>
+
+Where the error occurred, or where this part of the stack trace
+applies.
+
+=item B<next()>
+
+The next (shallower) Net::SSLeay::Error object, corresponding to the
+next level up the stack trace.
+
+=item B<message( [$message] )>
+
+The caller-supplied message that this error will be prefixed with.  If
+this is a single word (no whitespace) then it will be printed as
+C<During `$message':>.
+
+=back
+
 =head1 FUNCTIONS
 
 These functions are available for export.
 
 =over
 
-=item B<die_if_ssl_error($context)>
+=item B<die_if_ssl_error($message)>
 
 This is similar to L<Net::SSLeay>'s function of the same name, except;
 
@@ -185,9 +230,6 @@ chain of exception objects
 =item 2.
 
 The message is parceled to be hopefully a little more human-readable.
-If you pass a single word (no spaces), then it is wrapped with
-C<During `$context'>, otherwise if spaces exist it is prepended to the
-error message.
 
 =back
 
