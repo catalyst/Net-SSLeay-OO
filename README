@@ -5,6 +5,7 @@ This package is a wrapper for the Net::SSLeay module on CPAN.
 There is a good deal of blurb about it on its man page - go there for
 the details!
 
+
 Installing
 ----------
 The application is designed to be installed like a CPAN module; so use
@@ -18,6 +19,20 @@ The CPAN module dependencies will be highlighted during the first
 command. If you do not have 'sudo' installed, you can use:
 
   su root -c make install
+
+
+Dependencies
+------------
+Other than Net::SSLeay, the principle dependency of this module is
+Moose.  It may be possible to get the module working using Mouse; if
+you can get it to do so and still pass the test suite, please send a
+patch.
+
+
+Patching
+--------
+Please see the file SubmittingPatches for information.
+
 
 License and credits
 -------------------
