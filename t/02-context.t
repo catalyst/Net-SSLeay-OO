@@ -24,7 +24,8 @@ my $ctx_id;
 {
 	my $ctx = Net::SSLeay::OO::Context->new;
 
-	isa_ok( $ctx, "Net::SSLeay::OO::Context", "new Net::SSLeay::Context" );
+	isa_ok( $ctx, "Net::SSLeay::OO::Context",
+		"new Net::SSLeay::Context" );
 
 	$ctx_id = $ctx->ctx;
 	ok( $ctx_id, "has a ctx" );

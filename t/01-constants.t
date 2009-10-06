@@ -15,7 +15,7 @@ use Test::More qw(no_plan);
 
 BEGIN {
 	use_ok( "Net::SSLeay::OO::Constants", "OP_ALL",
-		"VERIFY_NONE",            "VERIFY_PEER"
+		"VERIFY_NONE",                "VERIFY_PEER"
 	);
 }
 

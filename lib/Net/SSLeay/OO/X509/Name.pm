@@ -45,7 +45,10 @@ sub AUTOLOAD {
 		my $nid_name = $field_to_NID{$field}
 			or croak "unknown method/field '$field'";
 		if ( !defined &{$nid_name} ) {
-			eval { Net::SSLeay::OO::Constants->import($nid_name); 1; }
+			eval {
+				Net::SSLeay::OO::Constants->import($nid_name);
+				1;
+				}
 				or croak "unknown NID '$nid_name'?; $@";
 		}
 		$self->get_text_by_NID(&$nid_name);
