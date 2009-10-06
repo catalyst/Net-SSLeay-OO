@@ -1,34 +1,34 @@
 
-package Net::SSLeay::Functions;
+package Net::SSLeay::OO::Functions;
 
 use Net::SSLeay;
 
 my %prefixes = (
-	""       => "Net::SSLeay::SSL",
-	BIO      => "Net::SSLeay::BIO",
-	CIPHER   => "Net::SSLeay::Cipher",
-	COMP     => "Net::SSLeay::Compression",
-	CTX      => "Net::SSLeay::Context",
-	DH       => "Net::SSLeay::KeyType::DH",
-	ENGINE   => "Net::SSLeay::Engine",
-	ERR      => "Net::SSLeay::Error",
-	EVP_PKEY => "Net::SSLeay::PrivateKey",
+	""       => "Net::SSLeay::OO::SSL",
+	BIO      => "Net::SSLeay::OO::BIO",
+	CIPHER   => "Net::SSLeay::OO::Cipher",
+	COMP     => "Net::SSLeay::OO::Compression",
+	CTX      => "Net::SSLeay::OO::Context",
+	DH       => "Net::SSLeay::OO::KeyType::DH",
+	ENGINE   => "Net::SSLeay::OO::Engine",
+	ERR      => "Net::SSLeay::OO::Error",
+	EVP_PKEY => "Net::SSLeay::OO::PrivateKey",
 
 	#MD2 => undef,
 	#MD4 => undef,
 	#MD5 => undef,
-	PEM => "Net::SSLeay::PEM",
+	PEM => "Net::SSLeay::OO::PEM",
 
 	#P_ASN1_UTCTIME => undef,
-	RAND    => "Net::SSLeay::PRNG",
-	RSA     => "Net::SSLeay::KeyType::RSA",
-	SESSION => "Net::SSLeay::Session",
+	RAND    => "Net::SSLeay::OO::PRNG",
+	RSA     => "Net::SSLeay::OO::KeyType::RSA",
+	SESSION => "Net::SSLeay::OO::Session",
 
 	#X509V3_EXT => undef,
-	X509_NAME      => "Net::SSLeay::X509::Name",
-	X509_STORE     => "Net::SSLeay::X509::Store",
-	X509_STORE_CTX => "Net::SSLeay::X509::Context",
-	X509           => "Net::SSLeay::X509",
+	X509_NAME      => "Net::SSLeay::OO::X509::Name",
+	X509_STORE     => "Net::SSLeay::OO::X509::Store",
+	X509_STORE_CTX => "Net::SSLeay::OO::X509::Context",
+	X509           => "Net::SSLeay::OO::X509",
 );
 
 my %ready;
@@ -90,7 +90,7 @@ sub import {
 				else {
 					$rv[0] = $code->( $pointer, @_ );
 				}
-				&Net::SSLeay::Error::die_if_ssl_error(
+				&Net::SSLeay::OO::Error::die_if_ssl_error(
 					$method);
 				wantarray ? @rv : $rv[0];
 			};
@@ -113,14 +113,14 @@ __END__
 
 =head1 NAME
 
-Net::SSLeay::Functions - convert Net::SSLeay functions to methods
+Net::SSLeay::OO::Functions - convert Net::SSLeay functions to methods
 
 =head1 SYNOPSIS
 
- use Net::SSLeay::Functions 'foo';
+ use Net::SSLeay::OO::Functions 'foo';
 
  # means, roughly:
- use Net::SSLeay::Functions sub {
+ use Net::SSLeay::OO::Functions sub {
          my $code = shift;
          sub {
              my $self = shift;

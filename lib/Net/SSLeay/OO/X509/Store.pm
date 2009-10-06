@@ -1,5 +1,5 @@
 
-package Net::SSLeay::X509::Store;
+package Net::SSLeay::OO::X509::Store;
 
 # wrapper for X509_STORE* functions
 #
@@ -17,7 +17,7 @@ has 'x509_store' => isa => 'Int',
 	required => 1,
 	;
 
-use Net::SSLeay::Functions 'x509_store';
+use Net::SSLeay::OO::Functions 'x509_store';
 
 # add_cert()
 # add_crl()
@@ -31,7 +31,7 @@ __END__
 
 =head1 NAME
 
-Net::SSLeay::X509::Store - wrapper for X509_STORE* pointers
+Net::SSLeay::OO::X509::Store - wrapper for X509_STORE* pointers
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ not, see <http://www.perlfoundation.org/artistic_license_2_0>
 
 =head1 SEE ALSO
 
-L<Net::SSLeay::OO>, L<Net::SSLeay::Context/get_cert_store>
+L<Net::SSLeay::OO>, L<Net::SSLeay::OO::Context/get_cert_store>
 
 =cut
 

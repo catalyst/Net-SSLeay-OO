@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-#  t/02-context.t - test the Net::SSLeay::Context binding
+#  t/02-context.t - test the Net::SSLeay::OO::Context binding
 #
 # Copyright (C) 2009  NZ Registry Services
 #
@@ -14,17 +14,17 @@ use Test::More qw(no_plan);
 use FindBin qw($Bin);
 
 BEGIN {
-	use_ok("Net::SSLeay::Context");
+	use_ok("Net::SSLeay::OO::Context");
 }
 
-use Net::SSLeay::Constants qw(OP_ALL VERIFY_NONE FILETYPE_PEM);
+use Net::SSLeay::OO::Constants qw(OP_ALL VERIFY_NONE FILETYPE_PEM);
 
 my $destroyed;
 my $ctx_id;
 {
-	my $ctx = Net::SSLeay::Context->new;
+	my $ctx = Net::SSLeay::OO::Context->new;
 
-	isa_ok( $ctx, "Net::SSLeay::Context", "new Net::SSLeay::Context" );
+	isa_ok( $ctx, "Net::SSLeay::OO::Context", "new Net::SSLeay::Context" );
 
 	$ctx_id = $ctx->ctx;
 	ok( $ctx_id, "has a ctx" );
@@ -39,7 +39,7 @@ my $ctx_id;
 		$ctx->use_certificate_chain_file(
 			"$Bin/certs/no-such-server-cert.pem");
 	};
-	isa_ok( $@, "Net::SSLeay::Error", "exception" );
+	isa_ok( $@, "Net::SSLeay::OO::Error", "exception" );
 
 	#&& diag $@;
 
@@ -49,11 +49,11 @@ my $ctx_id;
 	$ctx->use_certificate_chain_file("$Bin/certs/server-cert.pem");
 
 	my $store = $ctx->get_cert_store;
-	isa_ok( $store, "Net::SSLeay::X509::Store", "get_cert_store()" );
+	isa_ok( $store, "Net::SSLeay::OO::X509::Store", "get_cert_store()" );
 
-	my $old_sub = \&Net::SSLeay::Context::free;
+	my $old_sub = \&Net::SSLeay::OO::Context::free;
 	no warnings 'redefine';
-	*Net::SSLeay::Context::free = sub {
+	*Net::SSLeay::OO::Context::free = sub {
 		$destroyed = $_[0]->ctx;
 		$old_sub->(@_);
 	};

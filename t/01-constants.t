@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 #  t/01-constants.t - test that constants are correctly exported
-#                     by Net::SSLeay::Constants
+#                     by Net::SSLeay::OO::Constants
 #
 # Copyright (C) 2009  NZ Registry Services
 #
@@ -14,7 +14,7 @@ use strict;
 use Test::More qw(no_plan);
 
 BEGIN {
-	use_ok( "Net::SSLeay::Constants", "OP_ALL",
+	use_ok( "Net::SSLeay::OO::Constants", "OP_ALL",
 		"VERIFY_NONE",            "VERIFY_PEER"
 	);
 }
@@ -22,7 +22,7 @@ BEGIN {
 ok( &OP_ALL, "Imported OP_ALL" );
 cmp_ok( &VERIFY_PEER, '!=', &VERIFY_NONE, "Values are making some sense" );
 
-eval { Net::SSLeay::Constants->import("OP_YO_MOMMA") };
+eval { Net::SSLeay::OO::Constants->import("OP_YO_MOMMA") };
 isnt( $@, '', 'Trying to import bad symbol failed' );
 
 # Local Variables:

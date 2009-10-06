@@ -1,5 +1,5 @@
 
-package Net::SSLeay::Error;
+package Net::SSLeay::OO::Error;
 
 use Net::SSLeay;
 use Moose;
@@ -106,7 +106,7 @@ use overload
 use Sub::Exporter -setup =>
 	{ exports => [qw(die_if_ssl_error ssl_error_pending)], };
 
-use Net::SSLeay::Functions sub {
+use Net::SSLeay::OO::Functions sub {
 	my $code = shift;
 	sub {
 		my $self = shift;
@@ -120,7 +120,7 @@ __END__
 
 =head1 NAME
 
-Net::SSLeay::Error - encapsulated SSLeay errors
+Net::SSLeay::OO::Error - encapsulated SSLeay errors
 
 =head1 SYNOPSIS
 
@@ -141,7 +141,7 @@ Net::SSLeay::Error - encapsulated SSLeay errors
  }
 
  # if you need to manually check for errors ever
- use Net::SSLeay::Error qw(die_if_ssl_error ssl_error_pending);
+ use Net::SSLeay::OO::Error qw(die_if_ssl_error ssl_error_pending);
  die_if_ssl_error("Initialization");
 
 =head1 DESCRIPTION
@@ -152,7 +152,7 @@ occurs in a low level library an exception is raised via C<die>.
 OpenSSL has an 'error queue', which normally represents something like
 a stack trace indicating the context of the error.  The first error
 will be the "deepest" error and usually has the most relevant error
-message.  To represent this, the Net::SSLeay::Error object has a
+message.  To represent this, the Net::SSLeay::OO::Error object has a
 B<next> property, which represents a level further up the exception
 heirarchy.
 
@@ -190,7 +190,7 @@ applies.
 
 =item B<next()>
 
-The next (shallower) Net::SSLeay::Error object, corresponding to the
+The next (shallower) Net::SSLeay::OO::Error object, corresponding to the
 next level up the stack trace.
 
 =item B<message( [$message] )>
@@ -244,7 +244,7 @@ were:
 =item B<ssl_error_pending()>
 
 Returns a non-zero integer if there is an error pending.  To fetch it,
-just create a new L<Net::SSLeay::Error> object.
+just create a new L<Net::SSLeay::OO::Error> object.
 
 =back
 

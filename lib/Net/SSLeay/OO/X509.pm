@@ -1,5 +1,5 @@
 
-package Net::SSLeay::X509;
+package Net::SSLeay::OO::X509;
 
 use Moose;
 
@@ -38,14 +38,14 @@ BEGIN {
 		my $sslfunc = "Net::SSLeay::X509_$get";
 		*$get = sub {
 			my $self = shift;
-			require Net::SSLeay::X509::Name;
+			require Net::SSLeay::OO::X509::Name;
 			my $name = &$sslfunc( $self->x509 );
-			Net::SSLeay::X509::Name->new( x509_name => $name );
+			Net::SSLeay::OO::X509::Name->new( x509_name => $name );
 		};
 	}
 }
 
-use Net::SSLeay::Functions 'x509';
+use Net::SSLeay::OO::Functions 'x509';
 
 # load_cert_crl_file()
 # load_cert_file()
@@ -58,7 +58,7 @@ __END__
 
 =head1 NAME
 
-Net::SSLeay::X509 - OpenSSL SSL certificate
+Net::SSLeay::OO::X509 - OpenSSL SSL certificate
 
 =head1 SYNOPSIS
 
@@ -113,7 +113,7 @@ which signs this certificate.  Unlike PGP, individual SSL certificates
 can only have one signature attached, which needs to lead back to some
 trusted root certificate.
 
-These entities are not strings; they are L<Net::SSLeay::X509::Name>
+These entities are not strings; they are L<Net::SSLeay::OO::X509::Name>
 objects.
 
 =item B<get_subjectAltNames>
@@ -143,7 +143,7 @@ refcounted, and the reference is going to expire soon.
 
 =head2 Arcane Internal Methods
 
-The notes on L<Net::SSLeay::Context> about the un-triaged methods all
+The notes on L<Net::SSLeay::OO::Context> about the un-triaged methods all
 apply to these methods.
 
 =over
@@ -187,8 +187,8 @@ not, see <http://www.perlfoundation.org/artistic_license_2_0>
 
 =head1 SEE ALSO
 
-L<Net::SSLeay::OO>, L<Net::SSLeay::X509::Name>,
-L<Net::SSLeay::X509::Store>, L<Net::SSLeay::X509::Context>
+L<Net::SSLeay::OO>, L<Net::SSLeay::OO::X509::Name>,
+L<Net::SSLeay::OO::X509::Store>, L<Net::SSLeay::X509::Context>
 
 =cut
 

@@ -1,5 +1,5 @@
 
-package Net::SSLeay::X509::Context;
+package Net::SSLeay::OO::X509::Context;
 
 # wrapper for X509_STORE_CTX* functions
 #
@@ -21,17 +21,17 @@ sub get_current_cert {
 	my $self = shift;
 	my $x509 = Net::SSLeay::X509_STORE_CTX_get_current_cert(
 		$self->x509_store_ctx, );
-	&Net::SSLeay::Error::die_if_ssl_error("get_current_cert");
+	&Net::SSLeay::OO::Error::die_if_ssl_error("get_current_cert");
 	if ($x509) {
-		require Net::SSLeay::X509;
-		Net::SSLeay::X509->new( x509 => $x509, no_rvinc => 1 );
+		require Net::SSLeay::OO::X509;
+		Net::SSLeay::OO::X509->new( x509 => $x509, no_rvinc => 1 );
 	}
 }
 
 # getting all these right is made harder by the lack of OpenSSL docs
 # for these methods...
 
-use Net::SSLeay::Functions 'x509_store_ctx';
+use Net::SSLeay::OO::Functions 'x509_store_ctx';
 
 # un-triaged:
 #   get_error()
@@ -48,13 +48,13 @@ __END__
 
 =head1 NAME
 
-Net::SSLeay::X509::Context - wrapper for X509_STORE_CTX* pointers
+Net::SSLeay::OO::X509::Context - wrapper for X509_STORE_CTX* pointers
 
 =head1 SYNOPSIS
 
   # ... within callback installed by
-  #     Net::SSLeay::Context::set_verify ...
-  my $x509_ctx = Net::SSLeay::X509::Context->new(
+  #     Net::SSLeay::OO::Context::set_verify ...
+  my $x509_ctx = Net::SSLeay::OO::X509::Context->new(
       x509_store_ctx => $x509_store_ctx,
       );
   my $cert = $x509_ctx->get_current_cert;
@@ -85,7 +85,7 @@ not, see <http://www.perlfoundation.org/artistic_license_2_0>
 
 =head1 SEE ALSO
 
-L<Net::SSLeay::OO>, L<Net::SSLeay::Context/set_verify>
+L<Net::SSLeay::OO>, L<Net::SSLeay::OO::Context/set_verify>
 
 =cut
 

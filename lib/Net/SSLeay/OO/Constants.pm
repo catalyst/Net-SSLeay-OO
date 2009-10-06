@@ -1,5 +1,5 @@
 
-package Net::SSLeay::Constants;
+package Net::SSLeay::OO::Constants;
 
 use strict;
 use warnings;
@@ -8,11 +8,11 @@ use Net::SSLeay;
 
 =head1 NAME
 
-Net::SSLeay::Constants - Importer interface to Net::SSLeay constants
+Net::SSLeay::OO::Constants - Importer interface to Net::SSLeay constants
 
 =head1 SYNOPSIS
 
- use Net::SSLeay::Constants qw(OP_ALL);
+ use Net::SSLeay::OO::Constants qw(OP_ALL);
 
  print OP_ALL;
 

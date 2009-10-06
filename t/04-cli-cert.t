@@ -34,13 +34,13 @@ sub diag {
 $ENV{RND_SEED} = '1234567890123456789012345678901234567890';
 
 use Net::SSLeay::OO;
-use Net::SSLeay::Constants qw(VERIFY_PEER FILETYPE_PEM);
-use Net::SSLeay::X509;
-use Net::SSLeay::X509::Context;
+use Net::SSLeay::OO::Constants qw(VERIFY_PEER FILETYPE_PEM);
+use Net::SSLeay::OO::X509;
+use Net::SSLeay::OO::X509::Context;
 
 my $cert_dir = "$Bin/certs";
 
-my $ctx = Net::SSLeay::Context->new;
+my $ctx = Net::SSLeay::OO::Context->new;
 $ctx->set_default_passwd_cb( sub {"secr1t"} );
 $ctx->load_verify_locations( '', $cert_dir );
 
@@ -111,7 +111,7 @@ unless ($child_pid) {
 	);
 	$ctx->set_verify( VERIFY_PEER, $cb );
 
-	my $ssl = Net::SSLeay::SSL->new( ctx => $ctx );
+	my $ssl = Net::SSLeay::OO::SSL->new( ctx => $ctx );
 
 	$ssl->set_rfd( fileno(RS) );
 	$ssl->set_wfd( fileno(WS) );
@@ -156,7 +156,7 @@ diag("client - use certificate");
 $ctx->use_certificate_chain_file("$cert_dir/client-cert.pem");
 $ctx->use_PrivateKey_file( "$cert_dir/client-key.pem", FILETYPE_PEM );
 
-my $ssl = Net::SSLeay::SSL->new( ctx => $ctx );
+my $ssl = Net::SSLeay::OO::SSL->new( ctx => $ctx );
 $ssl->set_rfd( fileno(RC) );
 $ssl->set_wfd( fileno(WC) );
 diag("client - connect");

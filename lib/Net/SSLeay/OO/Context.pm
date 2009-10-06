@@ -1,22 +1,22 @@
 
-package Net::SSLeay::Context;
+package Net::SSLeay::OO::Context;
 
 use Moose;
 
 use Net::SSLeay;
-use Net::SSLeay::Error;
+use Net::SSLeay::OO::Error;
 
 =head1 NAME
 
-Net::SSLeay::Context - OO interface to Net::SSLeay CTX_ methods
+Net::SSLeay::OO::Context - OO interface to Net::SSLeay CTX_ methods
 
 =head1 SYNOPSIS
 
- use Net::SSLeay::Constants qw(OP_ALL FILETYPE_PEM OP_NO_SSLv2);
- use Net::SSLeay::Context;
+ use Net::SSLeay::OO::Constants qw(OP_ALL FILETYPE_PEM OP_NO_SSLv2);
+ use Net::SSLeay::OO::Context;
 
  # create an SSL object, disable SSLv2
- my $ctx = Net::SSLeay::Context->new;
+ my $ctx = Net::SSLeay::OO::Context->new;
  $ctx->set_options(OP_ALL & OP_NO_SSLv2);
 
  # specify path to your CA certificates for verifying peer
@@ -30,8 +30,8 @@ Net::SSLeay::Context - OO interface to Net::SSLeay CTX_ methods
  $ctx->set_verify(VERIFY_PEER & VERIFY_FAIL_IF_NO_PEER_CERT);
 
  # now make SSL objects with these options!
- use Net::SSLeay::SSL;
- my $ssl = Net::SSLeay::SSL->new( ctx => $ctx );
+ use Net::SSLeay::OO::SSL;
+ my $ssl = Net::SSLeay::OO::SSL->new( ctx => $ctx );
 
  # convenience method for the above, plus attach to a socket
  my $ssl = $ctx->new_ssl($socket);
@@ -39,12 +39,12 @@ Net::SSLeay::Context - OO interface to Net::SSLeay CTX_ methods
 =head1 DESCRIPTION
 
 Every SSL connection has a context, which specifies various options.
-You can also specify these options on Net::SSLeay::SSL objects, but
+You can also specify these options on Net::SSLeay::OO::SSL objects, but
 you would normally want to set up as much as possible early on, then
 re-use the context to create new SSL handles.
 
 The OpenSSL library initialization functions are called the first time
-that a Net::SSLeay::Context object is instantiated.
+that a Net::SSLeay::OO::Context object is instantiated.
 
 =cut
 
@@ -67,8 +67,8 @@ Specify the SSL version to allow.  10 means TLSv1, 2 and 3 mean SSLv2
 and SSLv3, respectively.  No options means 'SSLv23'; if you want to
 permit the secure protocols only (SSLv3 and TLSv1) you need to use:
 
-  use Net::SSLeay::Constants qw(OP_NO_SSLv2);
-  my $ctx = Net::SSLeay::Context->new();
+  use Net::SSLeay::OO::Constants qw(OP_NO_SSLv2);
+  my $ctx = Net::SSLeay::OO::Context->new();
   $ctx->set_options( OP_NO_SSLv2 )
 
 This option must be specified at object creation time.
@@ -109,7 +109,7 @@ sub DESTROY {
 =head1 METHODS
 
 All of the CTX_ methods in Net::SSLeay are converted to methods of
-the Net::SSLeay::Context class.
+the Net::SSLeay::OO::Context class.
 
 The documentation that follows is a core set, sufficient for running
 up a server and verifying client certificates.  However most functions
@@ -123,7 +123,7 @@ from the OpenSSL library are actually imported.
 
 Set options that apply to this Context.  The valid values and
 descriptions can be found on L<SSL_CTX_set_options(3ssl)>; for this
-module they must be imported from L<Net::SSLeay::Constants>.
+module they must be imported from L<Net::SSLeay::OO::Constants>.
 
 =item B<get_options()>
 
@@ -160,18 +160,18 @@ every certificate in the chain of the peer, starting with the root
 certificate.  Each time, it is passed two arguments: the first a
 boolean (1 or 0) which indicates whether the in-built certificate
 verification passed, and the second argument is the actual
-B<certficate> which is being verified (a L<Net::SSLeay::X509> object).
+B<certficate> which is being verified (a L<Net::SSLeay::OO::X509> object).
 Note this is different to the calling convention of OpenSSL and
 Net::SSLeay, which instead (logically, anyway) pass a
-L<Net::SSLeay::X509::Context> object.  However there is little of
+L<Net::SSLeay::OO::X509::Context> object.  However there is little of
 interest in this other object, so for convenience the current
 certificate is passed instead as the second object.  The
-L<Net::SSLeay::X509::Context> is passed as a third argument should you
+L<Net::SSLeay::OO::X509::Context> is passed as a third argument should you
 need it.
 
-The passed L<Net::SSLeay::X509> object will not work outside of the
+The passed L<Net::SSLeay::OO::X509> object will not work outside of the
 callback; get everything out of it that you need inside it, or use the
-C<get_peer_certificate> method of L<Net::SSLeay::SSL> later.
+C<get_peer_certificate> method of L<Net::SSLeay::OO::SSL> later.
 
 Example:
 
@@ -189,7 +189,7 @@ Example:
 
 =cut
 
-use Net::SSLeay::Constants qw(VERIFY_NONE);
+use Net::SSLeay::OO::Constants qw(VERIFY_NONE);
 
 has 'verify_cb', is => "ro";
 
@@ -203,7 +203,7 @@ sub set_verify {
 		my ( $preverify_ok, $x509_store_ctx ) = @_;
 		if ($callback) {
 			my $x509_ctx =
-				Net::SSLeay::X509::Context->new(
+				Net::SSLeay::OO::X509::Context->new(
 				x509_store_ctx => $x509_store_ctx, );
 			my $cert = $x509_ctx->get_current_cert;
 			$callback->( $preverify_ok, $cert, $x509_ctx );
@@ -214,7 +214,7 @@ sub set_verify {
 		}
 	};
 	$self->_set_verify( $mode, $real_cb );
-	&Net::SSLeay::Error::die_if_ssl_error("set_verify");
+	&Net::SSLeay::OO::Error::die_if_ssl_error("set_verify");
 }
 
 sub _set_verify {
@@ -257,7 +257,7 @@ C<use_certificate_file>
 
 Sets/gets the mode of SSL objects created from this context.  See
 L<SSL_set_mode(3ssl)>.  This is documented more fully at
-L<Net::SSLeay::SSL/set_mode>
+L<Net::SSLeay::OO::SSL/set_mode>
 
 =back
 
@@ -267,7 +267,7 @@ L<Net::SSLeay::SSL/set_mode>
 
 =item B<new_ssl($socket)>
 
-Makes a new L<Net::SSLeay::SSL> object using this Context, and attach
+Makes a new L<Net::SSLeay::OO::SSL> object using this Context, and attach
 it to the given socket (if passed).
 
 =cut
@@ -275,7 +275,7 @@ it to the given socket (if passed).
 sub new_ssl {
 	my $self   = shift;
 	my $socket = shift;
-	my $ssl    = Net::SSLeay::SSL->new( ctx => $self );
+	my $ssl    = Net::SSLeay::OO::SSL->new( ctx => $self );
 	if ($socket) {
 		$ssl->set_fd( fileno($socket) );
 	}
@@ -286,9 +286,9 @@ sub new_ssl {
 
 =item B<accept($socket)>
 
-Further convenience methods, which create a new L<Net::SSLeay::SSL>
+Further convenience methods, which create a new L<Net::SSLeay::OO::SSL>
 object, wire it up to the passed socket, then call either C<connect>
-or C<accept>.  Returns the L<Net::SSLeay::SSL> object.
+or C<accept>.  Returns the L<Net::SSLeay::OO::SSL> object.
 
 =cut
 
@@ -312,23 +312,23 @@ sub accept {
 
 =item B<get_cert_store()>
 
-Returns the L<Net::SSLeay::X509::Store> associated with this context.
+Returns the L<Net::SSLeay::OO::X509::Store> associated with this context.
 
 =cut
 
 sub get_cert_store {
 	my $self = shift;
-	require Net::SSLeay::X509::Store;
+	require Net::SSLeay::OO::X509::Store;
 	my $store = Net::SSLeay::CTX_get_cert_store( $self->ctx ),
-		&Net::SSLeay::Error::die_if_ssl_error("get_cert_store");
-	Net::SSLeay::X509::Store->new( x509_store => $store );
+		&Net::SSLeay::OO::Error::die_if_ssl_error("get_cert_store");
+	Net::SSLeay::OO::X509::Store->new( x509_store => $store );
 }
 
 =back
 
 =cut
 
-use Net::SSLeay::Functions "ctx";
+use Net::SSLeay::OO::Functions "ctx";
 
 1;
 
@@ -421,8 +421,8 @@ not, see <http://www.perlfoundation.org/artistic_license_2_0>
 
 =head1 SEE ALSO
 
-L<Net::SSLeay::OO>, L<Net::SSLeay::Constants>, L<Net::SSLeay::SSL>,
-L<Net::SSLeay::X509>, L<Net::SSLeay::Error>
+L<Net::SSLeay::OO>, L<Net::SSLeay::OO::Constants>, L<Net::SSLeay::SSL>,
+L<Net::SSLeay::OO::X509>, L<Net::SSLeay::Error>
 
 =cut
 

@@ -1,5 +1,5 @@
 
-package Net::SSLeay::Session;
+package Net::SSLeay::OO::Session;
 
 use Moose;
 
@@ -8,7 +8,7 @@ has 'session'    => isa => 'Int',
 	required => 1,
 	;
 
-use Net::SSLeay::Functions 'session';
+use Net::SSLeay::OO::Functions 'session';
 
 sub DESTROY {
 	my $self = shift;
@@ -21,7 +21,7 @@ __END__
 
 =head1 NAME
 
-Net::SSLeay::Session - representation of SSL_SESSION* objects
+Net::SSLeay::OO::Session - representation of SSL_SESSION* objects
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ not, see <http://www.perlfoundation.org/artistic_license_2_0>
 
 =head1 SEE ALSO
 
-L<Net::SSLeay::OO>, L<Net::SSLeay::SSL>
+L<Net::SSLeay::OO>, L<Net::SSLeay::OO::SSL>
 
 =cut
 

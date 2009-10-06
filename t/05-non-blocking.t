@@ -18,11 +18,11 @@ use Net::SSLeay::OO;
 use IO::Handle;
 use FindBin qw($Bin);
 
-my $ctx = Net::SSLeay::Context->new;
+my $ctx = Net::SSLeay::OO::Context->new;
 
 our $DEBUG = $ENV{DEBUG_SSL};
 
-use Net::SSLeay::Constants qw(ERROR_WANT_READ ERROR_WANT_WRITE
+use Net::SSLeay::OO::Constants qw(ERROR_WANT_READ ERROR_WANT_WRITE
 	ERROR_NONE ERROR_WANT_CONNECT
 	FILETYPE_PEM
 	MODE_ENABLE_PARTIAL_WRITE
@@ -30,8 +30,8 @@ use Net::SSLeay::Constants qw(ERROR_WANT_READ ERROR_WANT_WRITE
 
 $ctx->set_default_passwd_cb( sub {"secr1t"} );
 
-my $client = Net::SSLeay::SSL->new( ctx => $ctx );
-my $server = Net::SSLeay::SSL->new( ctx => $ctx );
+my $client = Net::SSLeay::OO::SSL->new( ctx => $ctx );
+my $server = Net::SSLeay::OO::SSL->new( ctx => $ctx );
 $server->use_certificate_file( "$Bin/certs/server-cert.pem", FILETYPE_PEM );
 $server->use_PrivateKey_file( "$Bin/certs/server-key.pem", FILETYPE_PEM );
 

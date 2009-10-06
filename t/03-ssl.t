@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-#  t/03-ssl.t - test the Net::SSLeay::SSL binding
+#  t/03-ssl.t - test the Net::SSLeay::OO::SSL binding
 #
 # Copyright (C) 2009  NZ Registry Services
 #
@@ -14,17 +14,17 @@ use Test::More qw(no_plan);
 use FindBin qw($Bin);
 
 BEGIN {
-	use_ok("Net::SSLeay::SSL");
+	use_ok("Net::SSLeay::OO::SSL");
 }
 
-use Net::SSLeay::Constants qw(OP_ALL VERIFY_NONE FILETYPE_PEM);
+use Net::SSLeay::OO::Constants qw(OP_ALL VERIFY_NONE FILETYPE_PEM);
 
 my $destroyed;
 my $ssl_id;
 {
-	my $ssl = Net::SSLeay::SSL->new;
+	my $ssl = Net::SSLeay::OO::SSL->new;
 
-	isa_ok( $ssl, "Net::SSLeay::SSL", "new Net::SSLeay::SSL" );
+	isa_ok( $ssl, "Net::SSLeay::OO::SSL", "new Net::SSLeay::SSL" );
 
 	$ssl_id = $ssl->ssl;
 	ok( $ssl_id, "has a ssl" );
@@ -37,14 +37,14 @@ my $ssl_id;
 		$ssl->use_certificate_file(
 			"$Bin/certs/no-such-server-cert.pem", FILETYPE_PEM, );
 	};
-	isa_ok( $@,       "Net::SSLeay::Error", "exception" );
-	isa_ok( $@->next, "Net::SSLeay::Error", "exception trace" );
+	isa_ok( $@,       "Net::SSLeay::OO::Error", "exception" );
+	isa_ok( $@->next, "Net::SSLeay::OO::Error", "exception trace" );
 
 	#diag $@;
 
-	my $old_sub = \&Net::SSLeay::SSL::free;
+	my $old_sub = \&Net::SSLeay::OO::SSL::free;
 	no warnings 'redefine';
-	*Net::SSLeay::SSL::free = sub {
+	*Net::SSLeay::OO::SSL::free = sub {
 		$destroyed = $_[0]->ssl;
 		$old_sub->(@_);
 	};

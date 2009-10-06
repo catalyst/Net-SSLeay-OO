@@ -2,10 +2,10 @@
 package Net::SSLeay::OO;
 
 use Net::SSLeay;
-use Net::SSLeay::Functions;
-use Net::SSLeay::Error;
-use Net::SSLeay::Context;
-use Net::SSLeay::SSL;
+use Net::SSLeay::OO::Functions;
+use Net::SSLeay::OO::Error;
+use Net::SSLeay::OO::Context;
+use Net::SSLeay::OO::SSL;
 
 our $VERSION = "0.01";
 
@@ -21,9 +21,9 @@ Net::SSLeay::OO - OO Calling Method for Net::SSLeay
 
  use Net::SSLeay::OO;
 
- use Net::SSLeay::Constants qw(OP_ALL OP_NO_TLSv2);
+ use Net::SSLeay::OO::Constants qw(OP_ALL OP_NO_TLSv2);
 
- my $ctx = Net::SSLeay::Context->new;
+ my $ctx = Net::SSLeay::OO::Context->new;
  $ctx->set_options(OP_ALL & OP_NO_TLSv2);
  $ctx->load_verify_locations("", "/etc/ssl/certs");
 
@@ -31,7 +31,7 @@ Net::SSLeay::OO - OO Calling Method for Net::SSLeay
  my $socket = IO::Socket::INET->new(...);
 
  # create a new SSL object, and attach it to the socket
- my $ssl = Net::SSLeay::SSL->new(ctx => $ctx);
+ my $ssl = Net::SSLeay::OO::SSL->new(ctx => $ctx);
  $ssl->set_fd($socket);
 
  # initiate the SSL connection
@@ -125,14 +125,14 @@ know where to start.
 
 =over
 
-=item L<Net::SSLeay::Context> (C: C<SSL_CTX*>)
+=item L<Net::SSLeay::OO::Context> (C: C<SSL_CTX*>)
 
 The context object represents an individual configuration of the
 OpenSSL library.  Normally, you'll create one of these as you verify
 the configuration of your program - eg for a server, setting the CA
 certificates directory, and setting various other bits and bobs.
 
-=item L<Net::SSLeay::SSL> (C: C<SSL*>)
+=item L<Net::SSLeay::OO::SSL> (C: C<SSL*>)
 
 You have one of these per connection, and when you create one it is
 tied to a Context object, taking defaults from the Context object.
@@ -141,13 +141,13 @@ object.  Once you have created this object, you attach it to a
 filehandle/socket and then call either C<accept> or C<connect>,
 depending on which SSL role you are playing in the connection.
 
-=item L<Net::SSLeay::Constants>
+=item L<Net::SSLeay::OO::Constants>
 
 This module allows you to explicitly import SSLeay/OpenSSL constants
 for passing to various API methods, so that you don't have to
 specify the complete namespace to them.
 
-=item L<Net::SSLeay::Error> (C: <unsigned long>)
+=item L<Net::SSLeay::OO::Error> (C: <unsigned long>)
 
 This class represents an error from OpenSSL, actually a stack of
 errors.  These are raised and printed pretty transparently, but if you
@@ -156,64 +156,64 @@ no corresponding C struct, but the C<ERR_*> man pages (try C<man -k
 ERR_>) handle the integers that OpenSSL passes around internally as
 error codes.
 
-=item L<Net::SSLeay::X509> (C: C<X509*>)
+=item L<Net::SSLeay::OO::X509> (C: C<X509*>)
 
 This class represents a certificate.  You can't create these with this
 module, because of a lack of bindings in L<Net::SSLeay>, but various
 things will return them.
 
-=item L<Net::SSLeay::X509::Name> (C: C<X509_NAME*>)
+=item L<Net::SSLeay::OO::X509::Name> (C: C<X509_NAME*>)
 
 Retrieving things like the "issuer name" from X509 certificates
 returns one of these objects; you can then call C<-E<gt>oneline> on
 it, or print it to your requirements, to get a usable string.
 
-=item L<Net::SSLeay::X509::Store> (C: C<X509_STORE*>)
+=item L<Net::SSLeay::OO::X509::Store> (C: C<X509_STORE*>)
 
 This class represents a certificate store.  This would normally
 represent a local directory with certificates in it.  Currently the
 only way to get one of these is with
-L<Net::SSLeay::Context/get_cert_store>.
+L<Net::SSLeay::OO::Context/get_cert_store>.
 
-=item L<Net::SSLeay::X509::Context> (C: C<X509_STORE_CTX*>)
+=item L<Net::SSLeay::OO::X509::Context> (C: C<X509_STORE_CTX*>)
 
 This is a type of object that you get back during certificate
 verification.  You probably don't need to use this class unless you
 want certificate verification to fail based on custom rules during the
 actual handshake.
 
-=item L<Net::SSLeay::Session> (C: C<SSL_SESSION*>)
+=item L<Net::SSLeay::OO::Session> (C: C<SSL_SESSION*>)
 
 This seems to represent an actual SSL session; ie, after C<accept> or
 C<connect> has succeeded.  This is a pretty uninteresting class.
 About all you can do with it is pull out or alter the time the SSL
 session was established, and session timeouts.
 
-=item L<Net::SSLeay::Functions>
+=item L<Net::SSLeay::OO::Functions>
 
 This is the internal class which splits up the functions in
 L<Net::SSLeay> into class-specific packages.
 
-=item C<Net::SSLeay::BIO>
+=item C<Net::SSLeay::OO::BIO>
 
-=item C<Net::SSLeay::Cipher>
+=item C<Net::SSLeay::OO::Cipher>
 
-=item C<Net::SSLeay::Compression>
+=item C<Net::SSLeay::OO::Compression>
 
-=item C<Net::SSLeay::PRNG>
+=item C<Net::SSLeay::OO::PRNG>
 
-=item C<Net::SSLeay::Engine>
+=item C<Net::SSLeay::OO::Engine>
 
-=item C<Net::SSLeay::PrivateKey>
+=item C<Net::SSLeay::OO::PrivateKey>
 
-=item C<Net::SSLeay::PEM>
+=item C<Net::SSLeay::OO::PEM>
 
-=item C<Net::SSLeay::KeyType::DH>
+=item C<Net::SSLeay::OO::KeyType::DH>
 
-=item C<Net::SSLeay::KeyType::RSA>
+=item C<Net::SSLeay::OO::KeyType::RSA>
 
 These classes are currently all TO-DO.  All I've done is earmarked
-these packages in L<Net::SSLeay::Functions> as recipients for the
+these packages in L<Net::SSLeay::OO::Functions> as recipients for the
 corresponding L<Net::SSLeay> functions.  There's not a lot of
 boilerplate that has to be implemented to make them work, take a look
 at some of the implementations of some of the X509 classes to see how
@@ -307,7 +307,7 @@ OpenSSL:
 
 =back
 
-L<Net::SSLeay::Context>, L<Net::SSLeay::SSL>, L<Net::SSLeay::Error>
+L<Net::SSLeay::OO::Context>, L<Net::SSLeay::SSL>, L<Net::SSLeay::Error>
 
 =cut
 

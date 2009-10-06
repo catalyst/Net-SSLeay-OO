@@ -1,5 +1,5 @@
 
-package Net::SSLeay::X509::Name;
+package Net::SSLeay::OO::X509::Name;
 
 use Moose;
 use Carp qw(croak confess);
@@ -27,14 +27,14 @@ sub get_text_by_NID {
 	my $nid  = shift;
 	my $val  = Net::SSLeay::X509_NAME_get_text_by_NID( $self->x509_name,
 		$nid, );
-	&Net::SSLeay::Error::die_if_ssl_error("get_text_by_nid($nid)");
+	&Net::SSLeay::OO::Error::die_if_ssl_error("get_text_by_nid($nid)");
 
 	# work around a bug in X509_NAME_get_text_by_NID
 	chop($val) if substr( $val, -1, 1 ) eq "\0";
 	$val;
 }
 
-use Net::SSLeay::Functions 'x509_name';
+use Net::SSLeay::OO::Functions 'x509_name';
 
 sub AUTOLOAD {
 	no strict 'refs';
@@ -45,7 +45,7 @@ sub AUTOLOAD {
 		my $nid_name = $field_to_NID{$field}
 			or croak "unknown method/field '$field'";
 		if ( !defined &{$nid_name} ) {
-			eval { Net::SSLeay::Constants->import($nid_name); 1; }
+			eval { Net::SSLeay::OO::Constants->import($nid_name); 1; }
 				or croak "unknown NID '$nid_name'?; $@";
 		}
 		$self->get_text_by_NID(&$nid_name);
@@ -58,7 +58,7 @@ __END__
 
 =head1 NAME
 
-Net::SSLeay::X509::Name - methods to call on SSL certificate names
+Net::SSLeay::OO::X509::Name - methods to call on SSL certificate names
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ Net::SSLeay::X509::Name - methods to call on SSL certificate names
  print "Common name is ".$name->cn."\n";
 
  # others...
- use Net::SSLeay::Constants qw(NID_pbe_WithSHA1And2_Key_TripleDES_CBC);
+ use Net::SSLeay::OO::Constants qw(NID_pbe_WithSHA1And2_Key_TripleDES_CBC);
  my $val = $name->get_text_by_NID(NID_pbe_WithSHA1And2_Key_TripleDES_CBC);
 
 =head1 DESCRIPTION
@@ -122,7 +122,7 @@ not, see <http://www.perlfoundation.org/artistic_license_2_0>
 
 =head1 SEE ALSO
 
-L<Net::SSLeay::OO>, L<Net::SSLeay::X509>
+L<Net::SSLeay::OO>, L<Net::SSLeay::OO::X509>
 
 =cut
 

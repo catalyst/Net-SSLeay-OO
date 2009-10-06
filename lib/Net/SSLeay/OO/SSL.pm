@@ -1,20 +1,20 @@
 
-package Net::SSLeay::SSL;
+package Net::SSLeay::OO::SSL;
 
 use Moose;
-use Net::SSLeay::Context;
+use Net::SSLeay::OO::Context;
 
 =head1 NAME
 
-Net::SSLeay::SSL - OO interface to Net::SSLeay methods
+Net::SSLeay::OO::SSL - OO interface to Net::SSLeay methods
 
 =head1 SYNOPSIS
 
- use Net::SSLeay::Constants qw(OP_ALL);
- use Net::SSLeay::SSL;
+ use Net::SSLeay::OO::Constants qw(OP_ALL);
+ use Net::SSLeay::OO::SSL;
 
  # basic (insecure!) use - see below
- my $ssl = Net::SSLeay::SSL->new;
+ my $ssl = Net::SSLeay::OO::SSL->new;
  $ssl->set_fd(fileno($socket));
  $ssl->connect;
 
@@ -24,7 +24,7 @@ This module adds some OO niceties to using the Net::SSLeay / OpenSSL
 SSL objects.
 
 This SSL object is a per-connection entity.  In general you will
-create one of these from a L<Net::SSLeay::Context> object which you
+create one of these from a L<Net::SSLeay::OO::Context> object which you
 set up for your process and perhaps configured more fully.
 
 If you do not do that, then you are not certifying the authenticity of
@@ -55,16 +55,16 @@ has 'ssl'        => isa => "Int",
 
 =item ctx : Context
 
-A Net::SSLeay::Context object.  Automatically created if not assigned
-on creation of the Net::SSLeay::SSL.
+A Net::SSLeay::OO::Context object.  Automatically created if not assigned
+on creation of the Net::SSLeay::OO::SSL.
 
 =cut
 
-has 'ctx'        => isa => "Net::SSLeay::Context",
+has 'ctx'        => isa => "Net::SSLeay::OO::Context",
 	is       => "ro",
 	required => 1,
 	default  => sub {
-	Net::SSLeay::Context->new();
+	Net::SSLeay::OO::Context->new();
 	},
 	;
 
@@ -88,7 +88,7 @@ sub DESTROY {
 =head1 METHODS
 
 All of the methods in Net::SSLeay which are not obviously a part of
-some other class are converted to methods of the Net::SSLeay::SSL
+some other class are converted to methods of the Net::SSLeay::OO::SSL
 class.
 
 The documentation that follows is a core set, sufficient for running
@@ -110,14 +110,14 @@ negotiations.
 
 =item B<set_verify( $mode, [$verify_callback] )>
 
-=item B<use_certificate( Net::SSLeay::X509 $cert )>
+=item B<use_certificate( Net::SSLeay::OO::X509 $cert )>
 
 =item B<use_certificate_file( $filename, $type )>
 
 =item B<use_PrivateKey_file( $filename, $type )>
 
 These functions are all very much the same as in
-C<Net::SSLeay::Context> but apply only to this SSL object.  Note that
+C<Net::SSLeay::OO::Context> but apply only to this SSL object.  Note that
 some functions are not available, such as
 C<use_certificate_chain_file()> and C<set_default_cb_passwd()>
 
@@ -129,7 +129,7 @@ has 'verify_cb', is => "ro";
 
 BEGIN {
 	no strict 'refs';
-	*$_ = \&{"Net::SSLeay::Context::$_"}
+	*$_ = \&{"Net::SSLeay::OO::Context::$_"}
 		for qw(set_verify use_certificate);
 }
 
@@ -281,7 +281,7 @@ The cipher of the current session
 
 =item B<get_peer_certificate>
 
-Returns a L<Net::SSLeay::X509> object corresponding to the peer
+Returns a L<Net::SSLeay::OO::X509> object corresponding to the peer
 certificate; if you're a client, it's the server certificate.  If
 you're a server, it's the client certificate, if you requested it
 during handshake with C<set_verify>.
@@ -291,32 +291,32 @@ during handshake with C<set_verify>.
 sub get_peer_certificate {
 	my $self = shift;
 	my $x509 = Net::SSLeay::get_peer_certificate( $self->ssl );
-	&Net::SSLeay::Error::die_if_ssl_error("get_peer_certificate");
+	&Net::SSLeay::OO::Error::die_if_ssl_error("get_peer_certificate");
 	if ($x509) {
-		Net::SSLeay::X509->new( x509 => $x509 );
+		Net::SSLeay::OO::X509->new( x509 => $x509 );
 	}
 }
 
 =item B<get_session>
 
-Returns a Net::SSLeay::Session object corresponding to the SSL
+Returns a Net::SSLeay::OO::Session object corresponding to the SSL
 session.  This actually calls C<SSL_get1_session> to try to help save
 you from segfaults.
 
 =item B<set_session($session)>
 
 If for some reason you want to set the session, call this method,
-passing a Net::SSLeay::Session object.
+passing a Net::SSLeay::OO::Session object.
 
 =cut
 
 sub get_session {
 	my $self = shift;
-	require Net::SSLeay::Session;
+	require Net::SSLeay::OO::Session;
 	my $sessid = Net::SSLeay::get1_session( $self->ssl );
-	&Net::SSLeay::Error::die_if_ssl_error("get_session");
+	&Net::SSLeay::OO::Error::die_if_ssl_error("get_session");
 	if ($sessid) {
-		Net::SSLeay::Session->new( session => $sessid );
+		Net::SSLeay::OO::Session->new( session => $sessid );
 	}
 }
 
@@ -324,7 +324,7 @@ sub set_session {
 	my $self    = shift;
 	my $session = shift;
 	Net::SSLeay::set_session( $self->ssl, $session->session );
-	&Net::SSLeay::Error::die_if_ssl_error("set_session");
+	&Net::SSLeay::OO::Error::die_if_ssl_error("set_session");
 }
 
 =item B<state_string>
@@ -429,7 +429,7 @@ OpenSSL or Net::SSLeay ruin your day.
 # man page for them, or because they were marked as not for general
 # consumption.
 
-use Net::SSLeay::Functions 'ssl', -exclude => [
+use Net::SSLeay::OO::Functions 'ssl', -exclude => [
 	qw( get_time set_time get_timeout set_timeout
 		set_bio get_rbio get_wbio get0_session
 		get1_session ctrl callback_ctrl state
@@ -456,7 +456,7 @@ not, see <http://www.perlfoundation.org/artistic_license_2_0>
 
 =head1 SEE ALSO
 
-L<Net::SSLeay::OO>, L<Net::SSLeay::Context>, L<Net::SSLeay::Session>
+L<Net::SSLeay::OO>, L<Net::SSLeay::OO::Context>, L<Net::SSLeay::Session>
 
 =cut
 
