@@ -28,6 +28,10 @@ Moose.  It may be possible to get the module working using Mouse; if
 you can get it to do so and still pass the test suite, please send a
 patch.
 
+Note that the test suite requires the 'openssl' CLI to be installed,
+otherwise the t/certs/make-test-certs.sh script will fail at
+'Makefile.PL' stage.
+
 
 Patching
 --------
