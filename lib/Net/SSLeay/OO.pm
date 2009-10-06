@@ -222,11 +222,43 @@ to me and I'll include them in this distribution.
 
 =back
 
+=head1 SOURCE, SUBMISSIONS, SUPPORT
+
+Source code is available from Catalyst:
+
+  git://git.catalyst.net.nz/Net-SSLeay-OO.git
+
+And Github:
+
+  git://github.com/catalyst/Net-SSLeay-OO.git
+
+Please see the file F<SubmittingPatches> for information on preferred
+submission format.
+
+Suggested avenues for support:
+
+=over
+
+=item *
+
+Net::SSLeay developer's mailing list
+L<http://lists.alioth.debian.org/mailman/listinfo/net-ssleay-devel>
+
+=item *
+
+Contact the author and ask either politely or commercially for help.
+
+=item *
+
+Log a ticket on L<http://rt.cpan.org/>
+
+=back
+
 =head1 AUTHOR AND LICENCE
 
 All code in the L<Net::SSLeay::OO> distribution is written by Sam
-Vilain, L<samv@cpan.org>.  Development commissioned by NZ Registry
-Services.
+Vilain, L<sam.vilain@catalyst.net.nz>.  Development commissioned by NZ
+Registry Services.
 
 Copyright 2009, NZ Registry Services.  This module is licensed under
 the Artistic License v2.0, which permits relicensing under other Free
@@ -274,21 +306,6 @@ OpenSSL:
  *    for use in the OpenSSL Toolkit. (http://www.openssl.org/)"
 
 =back
-
-=head1 AUTHOR
-
-Sam Vilain, L<samv@cpan.org>
-
-=head1 COPYRIGHT
-
-Copyright (C) 2009  NZ Registry Services
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the Artistic License 2.0 or later.  You should
-have received a copy of the Artistic License the file COPYING.txt.  If
-not, see <http://www.perlfoundation.org/artistic_license_2_0>
-
-=head1 SEE ALSO
 
 L<Net::SSLeay::Context>, L<Net::SSLeay::SSL>, L<Net::SSLeay::Error>
 
