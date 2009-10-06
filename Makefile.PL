@@ -11,7 +11,7 @@ use inc::Module::Install;
 name            ("Net-SSLeay-OO");
 abstract        ("OO Calling Method for Net::SSLeay");
 author          ("Catalyst SRS Team <team-srs\@catalyst.net.nz>");
-version         0;
+version_from    ("lib/Net/SSLeay/OO.pm");
 license         ('artistic');
 
 requires        ("perl" => 5.008005);
