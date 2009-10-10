@@ -197,21 +197,24 @@ sub set_verify {
 	my $self     = shift;
 	my $mode     = shift;
 	my $callback = shift;
+	require Net::SSLeay::OO::X509::Context;
 
 	# always set a callback, unless VERIFY_NONE "is set"
 	my $real_cb = $mode == VERIFY_NONE ? undef : sub {
 		my ( $preverify_ok, $x509_store_ctx ) = @_;
+		my $x509_ctx =
+			Net::SSLeay::OO::X509::Context->new(
+			x509_store_ctx => $x509_store_ctx,);
+		my $cert = $x509_ctx->get_current_cert;
+		my $ok;
 		if ($callback) {
-			my $x509_ctx =
-				Net::SSLeay::OO::X509::Context->new(
-				x509_store_ctx => $x509_store_ctx, );
-			my $cert = $x509_ctx->get_current_cert;
-			$callback->( $preverify_ok, $cert, $x509_ctx );
-			$cert->free;
+			$ok = $callback->( $preverify_ok, $cert, $x509_ctx );
 		}
 		else {
-			$preverify_ok;
+			$ok = $preverify_ok;
 		}
+		$cert->free;
+		$ok;
 	};
 	$self->_set_verify( $mode, $real_cb );
 	&Net::SSLeay::OO::Error::die_if_ssl_error("set_verify");
