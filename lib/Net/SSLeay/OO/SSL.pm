@@ -433,7 +433,7 @@ use Net::SSLeay::OO::Functions 'ssl', -exclude => [
 	qw( get_time set_time get_timeout set_timeout
 		set_bio get_rbio get_wbio get0_session
 		get1_session ctrl callback_ctrl state
-		set_ssl_method get_ssl_method
+		set_ssl_method get_ssl_method set_cert_and_key
 		)
 ];
 

@@ -330,7 +330,8 @@ sub get_cert_store {
 
 =cut
 
-use Net::SSLeay::OO::Functions "ctx";
+use Net::SSLeay::OO::Functions "ctx",
+	-include => { set_cert_and_key => "set_cert_and_key" };
 
 1;
 
