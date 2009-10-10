@@ -40,8 +40,7 @@ BEGIN {
 			my $self = shift;
 			require Net::SSLeay::OO::X509::Name;
 			my $name = &$sslfunc( $self->x509 );
-			Net::SSLeay::OO::X509::Name->new(
-				x509_name => $name );
+			Net::SSLeay::OO::X509::Name->new(x509_name => $name );
 		};
 	}
 }

@@ -61,8 +61,7 @@ defined($child_pid) or die $!;
 unless ($child_pid) {
 	diag("child - using server cert");
 	$ctx->use_certificate_chain_file("$cert_dir/server-cert.pem");
-	$ctx->use_PrivateKey_file( "$cert_dir/server-key.pem", FILETYPE_PEM,
-	);
+	$ctx->use_PrivateKey_file( "$cert_dir/server-key.pem", FILETYPE_PEM,);
 
 	# we get one event for each certificate check
 	my @check_certs;

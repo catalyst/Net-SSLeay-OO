@@ -25,8 +25,9 @@ our %field_to_NID = qw(
 sub get_text_by_NID {
 	my $self = shift;
 	my $nid  = shift;
-	my $val  = Net::SSLeay::X509_NAME_get_text_by_NID( $self->x509_name,
-		$nid, );
+	my $val  =
+		Net::SSLeay::X509_NAME_get_text_by_NID( $self->x509_name,$nid,
+		);
 	&Net::SSLeay::OO::Error::die_if_ssl_error("get_text_by_nid($nid)");
 
 	# work around a bug in X509_NAME_get_text_by_NID
@@ -48,7 +49,7 @@ sub AUTOLOAD {
 			eval {
 				Net::SSLeay::OO::Constants->import($nid_name);
 				1;
-				}
+			}
 				or croak "unknown NID '$nid_name'?; $@";
 		}
 		$self->get_text_by_NID(&$nid_name);

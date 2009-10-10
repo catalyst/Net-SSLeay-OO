@@ -24,8 +24,7 @@ my $ctx_id;
 {
 	my $ctx = Net::SSLeay::OO::Context->new;
 
-	isa_ok( $ctx, "Net::SSLeay::OO::Context",
-		"new Net::SSLeay::Context" );
+	isa_ok( $ctx, "Net::SSLeay::OO::Context","new Net::SSLeay::Context" );
 
 	$ctx_id = $ctx->ctx;
 	ok( $ctx_id, "has a ctx" );
@@ -45,8 +44,7 @@ my $ctx_id;
 	#&& diag $@;
 
 	$ctx->set_default_passwd_cb( sub {"secr1t"} );
-	$ctx->use_PrivateKey_file( "$Bin/certs/server-key.pem",
-		FILETYPE_PEM );
+	$ctx->use_PrivateKey_file( "$Bin/certs/server-key.pem",FILETYPE_PEM );
 	$ctx->use_certificate_chain_file("$Bin/certs/server-cert.pem");
 
 	my $store = $ctx->get_cert_store;

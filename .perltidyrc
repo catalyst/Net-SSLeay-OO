@@ -4,6 +4,7 @@
 --continuation-indentation=8
 --entab-leading-whitespace=8
 --vertical-tightness=2
+-naws
 --closing-token-indentation=0
 --paren-tightness=1
 --brace-tightness=1
