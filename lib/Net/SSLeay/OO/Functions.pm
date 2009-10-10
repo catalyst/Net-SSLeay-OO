@@ -73,6 +73,19 @@ sub import {
 	my $pkg     = shift;
 	my $caller  = caller;
 	my $install = shift || sub {shift};
+	my %opts = @_;
+	my %exclude;
+	if ( my $aref = $opts{-exclude} ) {
+		die "usage: -exclude => [qw( func1 func2 )]"
+			unless ref $aref eq "ARRAY";
+		%exclude = map { $_ => 1 } @$aref;
+	}
+	my %include;
+	if ( my $href = $opts{-include} ) {
+		die "usage: -include => { foo_func => 'methname' }"
+			unless ref $href eq "HASH";
+		%include = %$href;
+	}
 	if ( !ref $install ) {
 		my $att = $install;
 		$install = sub {
@@ -98,11 +111,16 @@ sub import {
 	}
 	if ( my $table = delete $ready{$caller} ) {
 		while ( my ( $method, $code ) = each %$table ) {
+			next if $exclude{$method};
 			my $fullname = $caller . "::" . $method;
 			next if defined &{$fullname};
-			print STDERR "installing $method into $caller\n"
-				if $caller =~ /ErrorZZ/;
 			*{$fullname} = $install->( $code, $method );
+		}
+		while ( my ( $source, $dest ) = each %include ) {
+			my $fullname = $caller . "::" . $dest;
+			my $code = Net::SSLeay->can($source);
+			next unless $code;
+			*{$fullname} = $install->( $code, $dest );
 		}
 	}
 }
@@ -143,6 +161,23 @@ pointer is kept.
 The difference between the version of the installed handler function
 and the actual installed function is that the real one checks for
 OpenSSL errors which were raised while the function was called.
+
+After the first argument, options may be passed:
+
+=over
+
+=item B<-exclude => [qw(func1 func2)]>
+
+Specify NOT to include some functions that otherwise would be; perhaps
+they won't work, perhaps they are badly named for their argument types.
+
+=item B<-include => { func_name => 'method_name'}>
+
+Import the L<Net::SSLeay> function called C<func_name>, as the local
+method C<method_name>.  This is mostly useful for functions which were
+missing their prefix indicating the argument types.
+
+=back
 
 =head1 AUTHOR
 
