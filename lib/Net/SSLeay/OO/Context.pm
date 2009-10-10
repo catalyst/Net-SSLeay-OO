@@ -296,12 +296,14 @@ sub connect {
 	my $self = shift;
 	my $ssl  = $self->new_ssl(@_);
 	$ssl->connect();
+	$ssl;
 }
 
 sub accept {
 	my $self = shift;
 	my $ssl  = $self->new_ssl(@_);
 	$ssl->accept();
+	$ssl;
 }
 
 =back
