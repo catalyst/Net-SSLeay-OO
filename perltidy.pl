@@ -65,7 +65,7 @@ for my $file (@files) {
 		@tidy_opts,
 	);
 
-	my $rc = system("diff -q $file $file.tidy &>/dev/null");
+	my $rc = system("diff -q $file $file.tidy >/dev/null");
 	if ( !$rc ) {
 		unlink("$file.tidy");
 	}
