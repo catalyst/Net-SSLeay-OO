@@ -9,7 +9,7 @@
 perltidy.pl
 \.perltidyrc
 t/9[0-9].*\.t$
-examples/(?!cli-cert.*).*\.pl$
+examples/(?!cli-cert.*|sslecho).*\.pl$
 t/certs/index.txt
 t/certs/serial
 t/certs/.*\.(\d|pem|req)$
