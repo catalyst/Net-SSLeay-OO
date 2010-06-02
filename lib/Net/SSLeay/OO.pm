@@ -86,7 +86,7 @@ C<:>-delimited error string format.
 
 This is currently more of a promise than a reality; but eventually
 each of the access methods for the various objects will be able to
-know their lifetime in a robust fashion, so you should get less
+know their lifetime in a robust fashion, so you should get fewer
 segfaults.  Eg, some SSL functions don't return object references
 which are guaranteed to last very long, so if you wait too long before
 getting properties from them you will get a segfault.
