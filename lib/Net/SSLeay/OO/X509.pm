@@ -21,7 +21,8 @@ sub free {
 	my $self    = shift;
 	my $pointer = delete $self->{x509};
 	unless ( !$pointer or $self->no_rvinc ) {
-		Net::SSLeay::free($pointer);
+		# Don't actually free these - it just seems to cause segfaults.
+		#Net::SSLeay::free($pointer);
 	}
 }
 

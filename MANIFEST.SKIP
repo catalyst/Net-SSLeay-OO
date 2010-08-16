@@ -13,4 +13,5 @@ examples/(?!cli-cert.*|sslecho).*\.pl$
 t/certs/index.txt
 t/certs/serial
 t/certs/.*\.(\d|pem|req)$
+t/04-cli-certs-
 Net-SSLeay-OO
