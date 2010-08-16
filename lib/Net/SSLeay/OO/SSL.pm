@@ -231,6 +231,12 @@ bytes, whichever is smaller.  How large that record is depends on the
 sender, but you need to receive an entire record before you can
 extract any data from it anyway.
 
+If you read back the empty string, then you can reasonably expect that
+the other end has either shut down the SSL session cleanly, or just
+hung up.  If you are returned C<undef>, then you may have to wait some
+time (such as, until the underlying socket has more data ready) and
+repeat the read.
+
 =item B<peek($max?)>
 
 Like C<read()>, but doesn't clear the data from the session buffer.
