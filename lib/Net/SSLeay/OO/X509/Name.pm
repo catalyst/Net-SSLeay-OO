@@ -31,7 +31,7 @@ sub get_text_by_NID {
 	&Net::SSLeay::OO::Error::die_if_ssl_error("get_text_by_nid($nid)");
 
 	# work around a bug in X509_NAME_get_text_by_NID
-	chop($val) if substr( $val, -1, 1 ) eq "\0";
+	chop($val) if defined $val and substr( $val, -1, 1 ) eq "\0";
 	$val;
 }
 
