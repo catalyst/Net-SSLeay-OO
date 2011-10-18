@@ -7,7 +7,7 @@ use Net::SSLeay::OO::Error;
 use Net::SSLeay::OO::Context;
 use Net::SSLeay::OO::SSL;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 1;
 

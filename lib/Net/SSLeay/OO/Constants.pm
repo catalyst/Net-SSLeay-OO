@@ -31,7 +31,7 @@ are hard-coded for the event that Net::SSLeay doesn't export them.
 
 =cut
 
-our $VERSION = "0.01";
+our $VERSION = "0.03";
 
 our %FALLBACK;
 

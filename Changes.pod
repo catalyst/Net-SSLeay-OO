@@ -1,7 +1,10 @@
 
 =head1 WHAT'S NEW IN Net::SSLeay::OO
 
-All releases to date by SAMV.
+=head1 RELEASE 0.03, 18 Oct 2011
+
+Change the constructor to the context object so that we can opt
+out of the call to "set_defualt_verify_paths".
 
 =head1 RELEASE 0.02, 10 Oct 2009
 
