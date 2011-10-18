@@ -73,6 +73,11 @@ permit the secure protocols only (SSLv3 and TLSv1) you need to use:
 
 This option must be specified at object creation time.
 
+=item use_default_verify_paths : Int
+
+Set this to zero if you don't want to use the system verify_location
+- see 'set_default_verify_paths'
+
 =back
 
 =cut
@@ -80,6 +85,12 @@ This option must be specified at object creation time.
 has 'ssl_version' => (
 	is  => "ro",
 	isa => "Int",
+);
+
+has 'use_default_verify_paths' => (
+	is  => "ro",
+	isa => "Int",
+	default => sub { 1 },
 );
 
 our $INITIALIZED;
@@ -94,7 +105,9 @@ sub BUILD {
 	if ( !$self->ctx ) {
 		my $ctx = Net::SSLeay::new_x_ctx( $self->ssl_version );
 		$self->{ctx} = $ctx;
-		$self->set_default_verify_paths;
+		if ( $self->use_default_verify_paths() ) {
+			$self->set_default_verify_paths;
+		}
 	}
 }
 
